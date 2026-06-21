@@ -1,0 +1,397 @@
+{% extends 'base.html' %}
+
+{% block title %}Apply for {{ job.title }} - {{ site_name }}{% endblock %}
+
+{% block content %}
+
+<!-- page-title -->
+<section class="page-title centred pt_110">
+    <div class="auto-container">
+        <div class="content-box">
+            <h1>Job Details</h1>
+            <ul class="bread-crumb clearfix">
+                <li><a href="{% url "core:home" %}">Home</a></li>
+                <li>-</li>
+                <li>Job Details</li>
+            </ul>
+        </div>
+    </div>
+</section>
+<!-- page-title end -->
+
+
+<!-- job-details -->
+<section class="job-details pt_110 pb_120">
+    <div class="auto-container">
+        <div class="row clearfix">
+            <div class="col-lg-4 col-md-12 col-sm-12 sidebar-side">
+                <div class="job-sidebar mr_40">
+                    <div class="info-widget sidebar-widget mb_30">
+                        <h4 class="card-title mb-4">Job Overview</h4>
+                        <ul class="clearfix">
+                            <li>
+                                <h5>Location</h5>
+                                <p><i class="fas fa-map-marker-alt text-dark me-2"></i> {{ job.location }}</p>
+                            </li>
+                            <li>
+                                <h5>Salary</h5>
+                                <p><i class="fas fa-money-bill text-dark me-2"></i> {{ job.get_salary_range }}</p>
+                            </li>
+                            <li>
+                                <h5>Experience Need</h5>
+                                <p><i class="fas fa-user-graduate text-dark me-2"></i> {{ job.get_experience_level_display }}</p>
+                            </li>
+                            <li>
+                                <h5>Job Type</h5>
+                                <p><i class="fas fa-briefcase text-dark me-2"></i> {{ job.get_job_type_display }}</p>
+                            </li>
+                        <li>
+                            <h5>Category</h5>
+                            <p><i class="fas fa-layer-group text-dark me-2"></i> {{ job.category.name }}</p> 
+                        </li>
+                        <li>
+                            <h5>Posted On</h5>
+                            
+                            <p><i class="fas fa-calendar text-dark me-2"></i> {{ job.posted_at|date:"M d, Y" }}</p> 
+                        </li>
+                        <li>
+                            <h5>Vacancies</h5>
+                            <p><i class="fas fa-users text-dark me-2"></i> {{ job.vacancies }}</p>
+                        </li>
+                        {% if job.application_deadline %}
+                            <li>
+                                <h5>Apply Within</h5>
+                                <p><i class="fas fa-clock text-dark me-2"></i> {{ job.vacancies }} {{ job.application_deadline|date:"M d, Y" }}</p>
+                            </li>
+                        {% endif %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-8 col-md-12 col-sm-12 content-side">
+                <h4 class="mb-4">Apply for Position</h4>
+                <div class="job-details-content">
+                    <!-- Job Summary -->
+                    <div class="bg-light p-3 rounded mb-4">
+                        <div class="d-flex align-items-center">
+                            {% if job.company_logo %}
+                            <img src="{{ job.company_logo.url }}" alt="{{ job.company_name }}" 
+                                 class="me-3 rounded" width="60" height="60" style="object-fit: cover;">
+                            {% else %}
+                            <div class="bg-primary text-white d-flex align-items-center justify-content-center me-3 rounded" 
+                                 style="width: 60px; height: 60px; font-size: 1.5rem;">
+                                {{ job.company_name|first|upper }}
+                            </div>
+                            {% endif %}
+                            <div>
+                                <h5 class="mb-1">{{ job.title }}</h5>
+                                <p class="mb-0 text-muted">
+                                    <i class="fas fa-map-marker-alt me-1"></i> {{ job.location }}
+                                    <span class="mx-2">|</span>
+                                    <span class="badge bg-primary">{{ job.get_job_type_display }}</span>
+                                    <span class="badge bg-secondary">{{ job.get_experience_level_display }}</span>
+                                    {% if job.is_remote %}
+                                    <span class="badge bg-success">Remote</span>
+                                    {% endif %}
+                                </p>
+                            </div>
+                        </div>
+                        
+                        {% if job.application_deadline %}
+                        <div class="mt-2">
+                            <small class="text-danger">
+                                <i class="fas fa-clock me-1"></i>
+                                Application Deadline: {{ job.application_deadline|date:"F d, Y" }} 
+                                ({{ job.application_deadline|timeuntil }} remaining)
+                            </small>
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Application Form -->
+                    <form method="POST" enctype="multipart/form-data" id="applicationForm" novalidate>
+                        {% csrf_token %}
+                        
+                        <!-- Personal Information -->
+                        <div class="mb-4">
+                            <h5 class="mb-3">
+                                <i class="fas fa-user me-2"></i>Your Information
+                            </h5>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Full Name</label>
+                                    <input type="text" class="form-control bg-light" value="{{ user.get_full_name }}" readonly>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Email Address</label>
+                                    <input type="email" class="form-control bg-light" value="{{ user.email }}" readonly>
+                                </div>
+                            </div>
+                            <div class="alert alert-info small mb-0">
+                                <i class="fas fa-info-circle me-1"></i>
+                                To update your personal information, go to your 
+                                <a href="{% url 'dashboard:update_profile' %}" class="alert-link">profile settings</a>.
+                            </div>
+                        </div>
+
+                        <!-- Resume Upload -->
+                        <div class="mb-4">
+                            <h5 class="mb-3">
+                                <i class="fas fa-file-pdf me-2"></i>Resume/CV 
+                                <span class="text-danger">*</span>
+                            </h5>
+                            
+                            {% if user.resume %}
+                            <div class="alert alert-success">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <i class="fas fa-check-circle me-2"></i>
+                                        <strong>Profile Resume:</strong> {{ user.resume.name }}
+                                    </div>
+                                    <div>
+                                        <a href="{{ user.resume.url }}" class="btn btn-sm btn-outline-success me-2" target="_blank">
+                                            <i class="fas fa-eye me-1"></i> View
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endif %}
+                            
+                            <div class="mb-2">
+                                <label for="resume" class="form-label">
+                                    {% if user.resume %}
+                                    Upload a different resume (optional)
+                                    {% else %}
+                                    Upload your resume
+                                    {% endif %}
+                                </label>
+                                <input type="file" class="form-control" id="resume" name="resume" 
+                                       accept=".pdf,.doc,.docx"
+                                       {% if not user.resume %}required{% endif %}>
+                                <div class="form-text">
+                                    <i class="fas fa-info-circle me-1"></i>
+                                    Accepted formats: PDF, DOC, DOCX. Maximum size: 5MB
+                                </div>
+                                <div class="invalid-feedback" id="resumeError"></div>
+                            </div>
+                        </div>
+
+                        <!-- Cover Letter -->
+                        <div class="mb-4">
+                            <h5 class="mb-3">
+                                <i class="fas fa-pen me-2"></i>Cover Letter 
+                                <span class="text-danger">*</span>
+                            </h5>
+                            <div class="mb-2">
+                                <textarea class="form-control" id="cover_letter" name="cover_letter" 
+                                          rows="10" required
+                                          placeholder="Dear Hiring Manager,
+
+                                    I am writing to express my strong interest in the {{ job.title }} position at {{ job.company_name }}...
+
+                                    [Explain why you're interested in this role and what makes you a great candidate]
+
+                                    [Highlight your relevant experience, skills, and achievements]
+
+                                    [Explain what you can bring to the company and why you'd be a great fit]
+
+                                    [Include any relevant projects, certifications, or achievements]
+
+                                    Thank you for considering my application. I look forward to the opportunity to discuss how I can contribute to {{ job.company_name }}.
+
+                                    Best regards,
+                                    {{ user.get_full_name }}"></textarea>
+                                <div class="form-text">
+                                    <span id="charCount">0</span> characters | 
+                                    <span class="text-muted">Minimum 50 characters</span>
+                                </div>
+                                <div class="invalid-feedback">
+                                    Please write a cover letter of at least 50 characters.
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Additional Notes -->
+                        <div class="mb-4">
+                            <h5 class="mb-3">
+                                <i class="fas fa-sticky-note me-2"></i>Additional Notes 
+                                <span class="text-muted">(Optional)</span>
+                            </h5>
+                            <textarea class="form-control" id="notes" name="notes" rows="3" 
+                                      placeholder="Any additional information you'd like to share with the employer..."></textarea>
+                        </div>
+
+                        <!-- Skills Match -->
+                        {% if user.skills and job.skills_required.all %}
+                        <div class="mb-4">
+                            <h5 class="mb-3">
+                                <i class="fas fa-check-double me-2"></i>Skills Match
+                            </h5>
+                            <div class="bg-light p-3 rounded">
+                                {% for skill in job.skills_required.all %}
+                                    {% if skill.name in user.skills %}
+                                    <span class="badge bg-success me-1 mb-1 p-2">
+                                        <i class="fas fa-check me-1"></i>{{ skill }}
+                                    </span>
+                                    {% else %}
+                                    <span class="badge bg-secondary me-1 mb-1 p-2">
+                                        <i class="fas fa-times me-1"></i>{{ skill }}
+                                    </span>
+                                    {% endif %}
+                                {% endfor %}
+                                <div class="mt-2">
+                                    <small class="text-muted">
+                                        <i class="fas fa-info-circle me-1"></i>
+                                        Green = You have this skill | Gray = Skill not in your profile
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        <!-- Confirmation -->
+                        <div class="mb-4">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="confirm" required>
+                                <label class="form-check-label" for="confirm">
+                                    I confirm that all information provided is accurate and complete. 
+                                    I authorize {{ job.company_name }} to contact me regarding this application 
+                                    and to verify the information provided.
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="d-flex justify-content-between align-items-center pt-3 border-top">
+                            <a href="{% url 'jobs:job_detail' job.slug %}" class="btn btn-outline-secondary btn-lg">
+                                <i class="fas fa-arrow-left me-2"></i>Back
+                            </a>
+                            <button type="submit" class="btn btn-primary btn-lg" id="submitBtn">
+                                <i class="fas fa-paper-plane me-2"></i>Submit Application
+                            </button>
+                        </div>
+                    </form>
+
+                    <!-- Tips -->
+                    <div class="card shadow-sm mt-4">
+                        <div class="card-body">
+                            <h5 class="card-title">
+                                <i class="fas fa-lightbulb text-warning me-2"></i>Tips for a Strong Application
+                            </h5>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <ul class="list-unstyled mb-0">
+                                        <li class="mb-2">
+                                            <i class="fas fa-check text-success me-2"></i>
+                                            Tailor your resume to this specific job
+                                        </li>
+                                        <li class="mb-2">
+                                            <i class="fas fa-check text-success me-2"></i>
+                                            Use keywords from the job description
+                                        </li>
+                                        <li class="mb-2">
+                                            <i class="fas fa-check text-success me-2"></i>
+                                            Quantify your achievements with numbers
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div class="col-md-6">
+                                    <ul class="list-unstyled mb-0">
+                                        <li class="mb-2">
+                                            <i class="fas fa-check text-success me-2"></i>
+                                            Research the company before applying
+                                        </li>
+                                        <li class="mb-2">
+                                            <i class="fas fa-check text-success me-2"></i>
+                                            Proofread for spelling and grammar
+                                        </li>
+                                        <li class="mb-2">
+                                            <i class="fas fa-check text-success me-2"></i>
+                                            Follow up after 1-2 weeks if no response
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- job-details end -->
+
+
+
+
+
+{% block extra_js %}
+<script>
+// Character counter for cover letter
+const coverLetter = document.getElementById('cover_letter');
+const charCount = document.getElementById('charCount');
+
+coverLetter.addEventListener('input', function() {
+    const count = this.value.length;
+    charCount.textContent = count;
+    charCount.className = count < 50 ? 'text-danger' : 'text-success';
+});
+
+// File size validation
+document.getElementById('resume').addEventListener('change', function() {
+    const file = this.files[0];
+    const errorDiv = document.getElementById('resumeError');
+    
+    if (file) {
+        // Check file size (5MB)
+        if (file.size > 5 * 1024 * 1024) {
+            errorDiv.textContent = 'File size exceeds 5MB limit. Please upload a smaller file.';
+            this.classList.add('is-invalid');
+            this.value = '';
+        } else {
+            // Check file type
+            const allowedTypes = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+            if (!allowedTypes.includes(file.type)) {
+                errorDiv.textContent = 'Invalid file type. Please upload PDF, DOC, or DOCX files.';
+                this.classList.add('is-invalid');
+                this.value = '';
+            } else {
+                this.classList.remove('is-invalid');
+                errorDiv.textContent = '';
+            }
+        }
+    }
+});
+
+// Form validation before submit
+document.getElementById('applicationForm').addEventListener('submit', function(e) {
+    const coverLetter = document.getElementById('cover_letter');
+    if (coverLetter.value.length < 50) {
+        e.preventDefault();
+        coverLetter.classList.add('is-invalid');
+        coverLetter.focus();
+        alert('Please write a cover letter of at least 50 characters.');
+    }
+});
+
+// Auto-save draft (optional)
+let autoSaveTimer;
+coverLetter.addEventListener('input', function() {
+    clearTimeout(autoSaveTimer);
+    autoSaveTimer = setTimeout(() => {
+        localStorage.setItem('coverLetterDraft', this.value);
+    }, 1000);
+});
+
+// Restore draft on load
+window.addEventListener('load', function() {
+    const draft = localStorage.getItem('coverLetterDraft');
+    if (draft && !coverLetter.value) {
+        if (confirm('You have a saved draft. Would you like to restore it?')) {
+            coverLetter.value = draft;
+        }
+    }
+});
+</script>
+{% endblock %}
+{% endblock %}

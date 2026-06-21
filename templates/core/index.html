@@ -1,0 +1,233 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Home - {{ site_name }}{% endblock %}
+
+{% block content %}
+
+<!-- banner-section -->
+<section class="banner-section p_relative centred">
+    <div class="pattern-layer" style="background-image: url({% static 'images/shape/shape11.png' %});"></div>
+
+    <div class="auto-container">
+        <div class="content-box">
+            <h2>Discover Your Next Career Opportunity</h2>
+            <p>Join a dynamic workplace where talent is valued and growth is encouraged. Discover opportunities
+                across various fields and find the perfect role to advance your career.</p>
+            <div class="btn-box">
+                <a href="{% url 'jobs:job_list' %}" class="theme-btn btn-one mr_20"><span>Browse Jobs</span></a>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- banner-section end -->
+
+<!-- about-style-two -->
+<section class="about-style-two">
+    <div class="auto-container">
+        <div class="row align-items-center">
+
+            <div class="col-lg-6 col-md-12 col-sm-12 content-column">
+                <div class="content_block_one">
+                    <div class="content-box mr_80">
+                        {% if site_settings %}
+                        <div class="sec-title pb_20 sec-title-animation animation-style2">
+                            <span class="sub-title mb_10 title-animation">About Us</span>
+                            <h2 class="title-animation" id="animated-title">
+                                {{ site_settings.about_title }}
+                            </h2>
+                        </div>
+
+                        <div class="text-box">
+                            <p>{{ site_settings.about_description|safe }}</p>
+                        </div>
+                        {% endif %}
+
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-6 col-md-12 col-sm-12 video-column">
+                <div class="video_block_two">
+                    <div class="video-box t_120 z_1 p_relative ml_40 mr_60 centred">
+                        <div class="video-inner"
+                            style="background-image: url({% static 'images/resource/video-1.jpg' %}); background-size: cover; background-position: center; min-height: 500px;">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+<!-- about-style-two end -->
+
+
+<!-- chooseus-section -->
+<section class="chooseus-section alternat-2 pt_120 pb_90">
+    <div class="auto-container">
+        {% if site_settings %}
+        <div class="sec-title pb_60 sec-title-animation animation-style2">
+            <span class="sub-title mb_10 title-animation">{{ site_settings.why_choose_us_title }}</span>
+            <h2 class="title-animation">{{ site_settings.why_choose_us_subtitle }}</h2>
+            <p>{{ site_settings.why_choose_us_description }}</p>
+        </div>
+        {% endif %}
+
+        <div class="inner-container">
+            <div class="row clearfix">
+                {% for feature in why_choose_us_features %}
+                <!-- Block 1 -->
+                <div class="col-lg-4 col-md-6 col-sm-12 chooseus-block">
+                    <div class="chooseus-block-one">
+                        <div class="inner-box">
+
+                            <div class="icon-box"><i class="{{ feature.icon }}"></i></div>
+
+                            <h3>{{ feature.title }}</h3>
+                            <p>
+                                {{ feature.description }}
+                            </p>
+
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="col-12 text-center py-5">
+                    <i class="fas fa-star fa-3x text-muted mb-3"></i>
+                    <p class="text-muted">Why choose us features coming soon.</p>
+                </div>
+                {% endfor %}
+
+            </div>
+        </div>
+
+    </div>
+</section>
+<!-- chooseus-section end -->
+
+
+<!-- job-section -->
+ {% if featured_jobs %}
+<section class="job-section pt_110 pb_90">
+    <div class="auto-container">
+        <div class="sec-title centred pb_60 sec-title-animation animation-style2">
+            <span class="sub-title mb_10 title-animation">Featured Jobs</span>
+            <h2 class="title-animation">Featured Jobs</h2>
+        </div>
+        <div class="inner-container">
+            <!-- Job Block -->
+             {% for job in featured_jobs %}
+            <div class="job-block-one">
+                <div class="upper-box">
+                    <ul class="job-info">
+                        <li><i class="icon-43"></i> <span class="text-dark"> Posted: </span>{{ job.posted_at|timesince }} ago</li>
+                        <li><span class="text-dark"> Job Type: </span> {{ job.get_job_type_display }}</li>
+                    </ul>
+                </div>
+                <div class="inner-box">
+                    <div class="title-box">
+                        <div class="icon-box"><i class="{{ job.category.icon }}"></i></i></div>
+                        <h3>{{ job.title }}</h3>
+                        <span><i class="fas fa-map-marker-alt"></i> {{ job.location }}</span>
+                    </div>
+                    <div class="salary-box">
+                        <h5>Salary</h5>
+                        <span>{{ job.get_salary_range }}</span>
+                    </div>
+                    <div class="experience-box">
+                        <h5>Experience need</h5>
+                        <span>{{ job.get_experience_level_display }}</span>
+                    </div>
+                    <div class="btn-box">
+                        <a href="{% url 'jobs:job_detail' job.slug %}" class="theme-btn btn-one">View Details</a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+
+            <!-- Centered Browse All Jobs Button -->
+            <div class="browse-jobs-btn centred mt_40">
+                <a href="{% url 'jobs:job_list' %}" class="theme-btn btn-two">Browse All Jobs</a>
+            </div>
+        </div>
+    </div>
+</section>
+{% endif %}
+<!-- job-section end -->
+
+
+
+<!-- industries-style-two -->
+{% if categories %}
+<section class="industries-style-two pt_120 pb_90">
+    <div class="pattern-layer" style="background-image: url({% static 'images/shape/shape-3.png' %});"></div>
+    <div class="auto-container">
+
+        <div class="sec-title light centred pb_60 sec-title-animation animation-style2">
+            <span class="sub-title mb_10 title-animation">Job Categories</span>
+            <h2 class="title-animation">Browse by Category</h2>
+        </div>
+
+        <div class="row clearfix">
+            {% for category in categories %}
+            <div class="col-lg-4 col-md-6 col-sm-12 industries-block">
+                <div class="industries-block-two">
+                    <div class="inner-box">
+                        <div class="icon-box"><i class="{{ category.icon }}"></i></div>
+                        <h3><a href="{% url 'jobs:job_list' %}?category={{ category.slug }}">{{ category.name }}</a></h3>
+                        <p>{{ category.jobs.count }} Jobs Available</p>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+<!-- industries-style-two end -->
+
+
+<!-- news-section -->
+ {% if recent_posts %}
+<section class="news-section pb_90">
+    <div class="auto-container">
+        <div class="sec-title centred pb_60 sec-title-animation animation-style2">
+            <span class="sub-title mb_10 title-animation">Media</span>
+            <h2 class="title-animation">Latest News</h2>
+        </div>
+        <div class="row clearfix">
+            {% for post in recent_posts %}
+            <div class="col-lg-4 col-md-6 col-sm-12 news-block">
+                <div class="news-block-one wow fadeInUp animated" data-wow-delay="00ms"
+                    data-wow-duration="1500ms">
+                    <div class="inner-box">                   
+                        <div class="bg-layer" {% if post.featured_image %} style="background-image: url({{ post.featured_image.url }});" {% endif %}>
+                        </div>
+                        <div class="overlay-bg-layer"{% if post.featured_image %} style="background-image: url({{ post.featured_image.url }});" {% endif %}>
+                        </div>
+                        <div class="content-box">
+                            <span class="post-date">{{ post.created_at }}</span>
+                            <h4><a href="{% url 'blog:post_detail' post.slug %}">{{ post.title }}</a></h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+             {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+<!-- news-section end -->
+
+
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const title = document.getElementById('animated-title');
+        const words = title.textContent.trim().split(' ');
+        const lastWord = words.pop();
+        title.innerHTML = words.join(' ') + ' <span>' + lastWord + '</span>';
+    });
+</script>
+{% endblock %}

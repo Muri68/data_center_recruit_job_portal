@@ -1,0 +1,157 @@
+{% extends 'dashboard/admin/admin_base.html' %}
+
+
+{% block title %}Create Blog Post - {{ site_name }}{% endblock %}
+
+{% block admin_content %}
+
+<div class="content container-fluid">
+
+    <div class="page-header">
+        <div class="row align-items-center">
+            <div class="col">
+                <h3 class="page-title">Create Blog Post</h3>
+                <p class="text-mute">Manage Blog Posts</p>
+                <ul class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{% url 'dashboard:redirect_dashboard' %}">Dashboard</a></li>
+                    <li class="breadcrumb-item active">Create Blog Post</li>
+                </ul>
+            </div>
+            <div class="col-auto text-right float-right ml-auto">
+                <a href="{% url 'dashboard:admin_blog_posts' %}" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left me-1"></i> Back to Posts
+                </a>
+            </div>
+        </div>
+    </div>
+
+
+    <form method="POST" enctype="multipart/form-data" id="blogPostForm">
+        {% csrf_token %}
+        
+        <div class="row">
+            <div class="col-lg-8">
+                <!-- Main Content -->
+                <div class="card shadow-sm mb-4">
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label for="title" class="form-label">Post Title *</label>
+                            <input type="text" class="form-control form-control-lg" id="title" name="title" required 
+                                placeholder="Enter post title...">
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="excerpt" class="form-label">Excerpt *</label>
+                            <textarea class="form-control" id="excerpt" name="excerpt" rows="3" required 
+                                    placeholder="Brief summary of the post..."></textarea>
+                            <div class="form-text">A short description that appears in blog listings.</div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="content" class="form-label">Content *</label>
+                            <textarea class="form-control ckeditor" id="content" name="content" rows="15" required></textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-4">
+                <!-- Publishing Options -->
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">Publishing</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label for="status" class="form-label">Status</label>
+                            <select class="form-control" id="status" name="status">
+                                <option value="draft">Draft</option>
+                                <option value="published">Publish</option>
+                            </select>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="category" class="form-label">Category *</label>
+                            <select class="form-control" id="category" name="category" required>
+                                <option value="">Select Category</option>
+                                {% for category in categories %}
+                                <option value="{{ category.id }}">{{ category.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Featured Image -->
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">Featured Image</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="text-center mb-3">
+                            <img id="imagePreview" src="#" alt="Preview" 
+                                class="img-fluid rounded" style="display: none; max-height: 200px;">
+                        </div>
+                        <input type="file" class="form-control" id="featured_image" name="featured_image" accept="image/*">
+                    </div>
+                </div>
+                
+                <!-- Tags -->
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">Tags</h5>
+                    </div>
+                    <div class="card-body">
+                        <input type="text" class="form-control" id="tags" name="tags" 
+                            placeholder="tag1, tag2, tag3">
+                        <div class="form-text">Separate tags with commas.</div>
+                    </div>
+                </div>
+                
+                <!-- Action Buttons -->
+                <button type="submit" name="status" value="draft" class="btn btn-outline-primary w-100 mb-2">
+                    <i class="fas fa-save me-1"></i> Save as Draft
+                </button>
+                <button type="submit" name="status" value="published" class="btn btn-primary w-100">
+                    <i class="fas fa-paper-plane me-1"></i> Publish Now
+                </button>
+            </div>
+        </div>
+    </form>
+
+</div>
+
+
+
+{% block extra_js %}
+
+
+<script>
+
+
+    // Image preview
+    document.getElementById('featured_image').addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                const img = document.getElementById('imagePreview');
+                img.src = event.target.result;
+                img.style.display = 'block';
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+
+    // Auto-generate excerpt from content
+    document.getElementById('content').addEventListener('keyup', function() {
+        if (CKEDITOR.instances.content) {
+            const text = CKEDITOR.instances.content.document.getBody().getText();
+            if (!document.getElementById('excerpt').value) {
+                document.getElementById('excerpt').value = text.substring(0, 200);
+            }
+        }
+    });
+</script>
+{% endblock %}
+{% endblock %}

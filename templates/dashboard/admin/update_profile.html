@@ -1,0 +1,161 @@
+{% extends 'dashboard/admin/admin_base.html' %}
+{% load static %}
+
+{% block title %} Update Admin Profile - {{ site_name }}{% endblock %}
+
+
+{% block admin_content %}
+
+<div class="content container-fluid">
+    <div class="page-header">
+        <div class="row align-items-center">
+            <div class="col">
+                <h2 class="page-title">My Profile</h2>
+                <p class="text-mute">Update your profile information</p>
+                <ul class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{% url 'dashboard:redirect_dashboard' %}">Dashboard</a></li>
+                    <li class="breadcrumb-item active">My Profile</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-sm">
+                <div class="card-header bg-danger text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-user-edit me-2"></i>Update Administrator Profile
+                    </h5>
+                </div>
+                <div class="card-body p-4">
+                    <form method="POST" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        
+                        <!-- Profile Picture Section -->
+                        <div class="text-center mb-4">
+                            {% if user.profile_picture %}
+                            <img src="{{ user.profile_picture.url }}" alt="{{ user.get_full_name }}" 
+                                class="rounded-circle mb-3" width="120" height="120" style="object-fit: cover;">
+                            {% else %}
+                            <div class="bg-danger text-white rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3" 
+                                style="width: 120px; height: 120px; font-size: 3rem;">
+                                {{ user.get_full_name|first|upper }}
+                            </div>
+                            {% endif %}
+                            <div>
+                                <label for="profile_picture" class="btn btn-outline-primary btn-sm">
+                                    <i class="fas fa-camera me-1"></i> Change Photo
+                                </label>
+                                <input type="file" id="profile_picture" name="profile_picture" 
+                                    accept="image/*" style="display: none;">
+                            </div>
+                        </div>
+
+                        <!-- Basic Information -->
+                        <h5 class="mb-3">
+                            <i class="fas fa-user me-2"></i>Basic Information
+                        </h5>
+                        <div class="row mb-4">
+                            <div class="col-md-6 mb-3">
+                                <label for="first_name" class="form-label">First Name *</label>
+                                <input type="text" class="form-control" id="first_name" name="first_name" 
+                                    value="{{ user.first_name }}" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="last_name" class="form-label">Last Name *</label>
+                                <input type="text" class="form-control" id="last_name" name="last_name" 
+                                    value="{{ user.last_name }}" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="email" class="form-label">Email Address</label>
+                                <input type="email" class="form-control bg-light" value="{{ user.email }}" readonly>
+                                <div class="form-text">Email cannot be changed here. Contact super admin for email changes.</div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="phone_number" class="form-label">Phone Number</label>
+                                <input type="tel" class="form-control" id="phone_number" name="phone_number" 
+                                    value="{{ user.phone_number|default:'' }}">
+                            </div>
+                        </div>
+
+                        <!-- Location & Bio -->
+                        <h5 class="mb-3">
+                            <i class="fas fa-info-circle me-2"></i>Additional Information
+                        </h5>
+                        <div class="row mb-4">
+                            <div class="col-12 mb-3">
+                                <label for="location" class="form-label">Location</label>
+                                <input type="text" class="form-control" id="location" name="location" 
+                                    value="{{ user.location|default:'' }}" 
+                                    placeholder="City, Country">
+                            </div>
+                            <div class="col-12 mb-3">
+                                <label for="bio" class="form-label">Bio</label>
+                                <textarea class="form-control" id="bio" name="bio" rows="4" 
+                                        placeholder="Tell about yourself...">{{ user.bio|default:'' }}</textarea>
+                            </div>
+                        </div>
+
+                        <!-- Account Settings -->
+                        <h5 class="mb-3">
+                            <i class="fas fa-cog me-2"></i>Account Settings
+                        </h5>
+                        <div class="card bg-light mb-4">
+                            <div class="card-body">
+                                <div class="form-check form-switch mb-3">
+                                    <input class="form-check-input" type="checkbox" id="email_notifications" 
+                                        name="email_notifications" {% if user.email_notifications %}checked{% endif %}>
+                                    <label class="form-check-label" for="email_notifications">
+                                        <strong>Email Notifications</strong>
+                                        <p class="text-muted small mb-0">Receive system notifications and alerts</p>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Security Note -->
+                        <div class="alert alert-info">
+                            <i class="fas fa-shield-alt me-2"></i>
+                            <strong>Security Note:</strong> As an administrator, some settings can only be changed 
+                            through the Django admin panel or by a super administrator.
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="d-flex justify-content-between pt-3 border-top">
+                            <a href="{% url 'dashboard:admin_profile' %}" class="btn btn-outline-secondary btn-lg">
+                                <i class="fas fa-arrow-left me-2"></i>Back to Profile
+                            </a>
+                            <button type="submit" class="btn btn-danger btn-lg">
+                                <i class="fas fa-save me-2"></i>Save Changes
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<script>
+// Trigger file input when button is clicked
+document.querySelector('label[for="profile_picture"]').addEventListener('click', function(e) {
+    e.preventDefault();
+    document.getElementById('profile_picture').click();
+});
+
+// Preview profile picture
+document.getElementById('profile_picture').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const img = document.querySelector('.rounded-circle');
+            if (img) {
+                img.src = e.target.result;
+            }
+        }
+        reader.readAsDataURL(file);
+    }
+});
+</script>
+{% endblock %}

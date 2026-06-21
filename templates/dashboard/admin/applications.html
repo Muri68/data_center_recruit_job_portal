@@ -1,0 +1,125 @@
+{% extends 'dashboard/admin/admin_base.html' %}
+
+{% block admin_content %}
+
+<div class="content container-fluid">
+
+    <div class="page-header">
+        <div class="row align-items-center">
+            <div class="col">
+                <h2 class="page-title">Applications</h2>
+                <p class="text-mute">Manage job applications</p>
+                <ul class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{% url 'dashboard:redirect_dashboard' %}">Dashboard</a></li>
+                    <li class="breadcrumb-item active">Applications</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">Manage Applications</h5>
+            <span class="badge bg-secondary text-white p-3">{{ applications.paginator.count }} Total</span>
+        </div>
+        <div class="card-body">
+            <!-- Filters -->
+            <form method="GET" class="row g-3 mb-4">
+                <div class="col-md-3">
+                    <input type="text" name="q" class="form-control" placeholder="Search..." value="{{ search_query }}">
+                </div>
+                <div class="col-md-3">
+                    <select name="status" class="form-control">
+                        <option value="">All Statuses</option>
+                        <option value="pending" {% if status_filter == 'pending' %}selected{% endif %}>Pending</option>
+                        <option value="reviewed" {% if status_filter == 'reviewed' %}selected{% endif %}>Reviewed</option>
+                        <option value="shortlisted" {% if status_filter == 'shortlisted' %}selected{% endif %}>Shortlisted</option>
+                        <option value="interviewed" {% if status_filter == 'interviewed' %}selected{% endif %}>Interviewed</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <select name="job" class="form-control">
+                        <option value="">All Jobs</option>
+                        {% for job in jobs %}
+                        <option value="{{ job.id }}" {% if job_filter == job.id|stringformat:"s" %}selected{% endif %}>
+                            {{ job.title }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-primary w-100">Filter</button>
+                </div>
+            </form>
+
+            <!-- Applications Table -->
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Applicant</th>
+                            <th>Job</th>
+                            <th>Status</th>
+                            <th>Applied</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for application in applications %}
+                        <tr>
+                            <td>
+                                <strong>{{ application.applicant.get_full_name }}</strong><br>
+                                <small>{{ application.applicant.email }}</small>
+                            </td>
+                            <td>{{ application.job.title }}</td>
+                            <td>
+                                <span class="badge p-2 bg-{{ application.get_status_color }}">
+                                    {{ application.get_status_display }}
+                                </span>
+                            </td>
+                            <td>{{ application.applied_at|date:"M d, Y" }}</td>
+                            <td>
+                                <a href="{% url 'dashboard:admin_application_detail' application.id %}" 
+                                class="btn btn-sm btn-outline-primary">
+                                    <i class="fas fa-eye"></i> View
+                                </a>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="5" class="text-center py-4">No applications found</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination -->
+            {% if applications.has_other_pages %}
+            <nav class="mt-4">
+                <ul class="pagination justify-content-center">
+                    {% if applications.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ applications.previous_page_number }}">Previous</a>
+                    </li>
+                    {% endif %}
+                    
+                    {% for num in applications.paginator.page_range %}
+                    <li class="page-item {% if applications.number == num %}active{% endif %}">
+                        <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                    </li>
+                    {% endfor %}
+                    
+                    {% if applications.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ applications.next_page_number }}">Next</a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+            {% endif %}
+        </div>
+    </div>
+
+</div>
+{% endblock %}

@@ -1,0 +1,294 @@
+{% extends 'dashboard/admin/admin_base.html' %}
+
+{% block admin_content %}
+
+<div class="content container-fluid">
+
+    <div class="page-header">
+        <div class="row align-items-center">
+            <div class="col">
+                <h2 class="page-title">Edit Job: {{ job.title }}</h2>
+                <p class="text-mute">Update the details of this job listing</p>
+                <ul class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{% url 'dashboard:redirect_dashboard' %}">Dashboard</a></li>
+                    <li class="breadcrumb-item active">Edit Job</li>
+                </ul>
+            </div>
+            <div class="col-auto text-right float-right ml-auto">
+                <a href="{% url 'jobs:job_detail' job.slug %}" class="btn btn-outline-info me-2" target="_blank">
+                    <i class="fas fa-eye me-2"></i> View Job
+                </a>
+                <a href="{% url 'dashboard:admin_jobs' %}" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left me-2"></i> Back to Jobs
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-xl-3 col-sm-6 col-12 d-flex">
+            <div class="card bg-nine w-100">
+                <div class="card-body text-center">
+                    <h5 class="mb-2">Status</h5>
+                    <h4>{{ job.get_status_display }}</h4>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-sm-6 col-12 d-flex">
+            <div class="card bg-six w-100">
+                <div class="card-body text-center">
+                    <h5 class="mb-2">Applications</h5>
+                    <h4>{{ job.applications_count }}</h4>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-sm-6 col-12 d-flex">
+            <div class="card bg-ten w-100">
+                <div class="card-body text-center">
+                    <h5 class="mb-2">Views</h5>
+                    <h4>{{ job.views_count }}</h4>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-sm-6 col-12 d-flex">
+            <div class="card bg-eleven w-100">
+                <div class="card-body text-center">
+                    <h5 class="mb-2">Posted</h5>
+                    <h4>{{ job.posted_at|date:"M d, Y" }}</h4>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-body p-4">
+            <form method="POST" enctype="multipart/form-data" id="editJobForm">
+                {% csrf_token %}
+                
+                <!-- Basic Information -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">Basic Information</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-8 mb-3">
+                                <label for="title" class="form-label">Job Title *</label>
+                                <input type="text" class="form-control" id="title" name="title" 
+                                    value="{{ job.title }}" required>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="category" class="form-label">Category *</label>
+                                <select class="form-control" id="category" name="category" required>
+                                    <option value="">Select Category</option>
+                                    {% for category in categories %}
+                                    <option value="{{ category.id }}" 
+                                            {% if job.category.id == category.id %}selected{% endif %}>
+                                        {{ category.name }}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="company_name" class="form-label">Company Name *</label>
+                                <input type="text" class="form-control" id="company_name" name="company_name" 
+                                    value="{{ job.company_name }}" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="company_website" class="form-label">Company Website</label>
+                                <input type="url" class="form-control" id="company_website" name="company_website" 
+                                    value="{{ job.company_website|default:'' }}">
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="company_logo" class="form-label">Company Logo</label>
+                            {% if job.company_logo %}
+                            <div class="mb-2">
+                                <img src="{{ job.company_logo.url }}" alt="{{ job.company_name }}" 
+                                    class="rounded" width="100">
+                            </div>
+                            {% endif %}
+                            <input type="file" class="form-control" id="company_logo" name="company_logo" accept="image/*">
+                            <div class="form-text">Leave empty to keep current logo</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Job Details -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">Job Details</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label for="location" class="form-label">Location *</label>
+                                <input type="text" class="form-control" id="location" name="location" 
+                                    value="{{ job.location }}" required>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="job_type" class="form-label">Job Type *</label>
+                                <select class="form-control" id="job_type" name="job_type" required>
+                                    <option value="">Select Job Type</option>
+                                    <option value="full_time" {% if job.job_type == 'full_time' %}selected{% endif %}>Full Time</option>
+                                    <option value="part_time" {% if job.job_type == 'part_time' %}selected{% endif %}>Part Time</option>
+                                    <option value="contract" {% if job.job_type == 'contract' %}selected{% endif %}>Contract</option>
+                                    <option value="internship" {% if job.job_type == 'internship' %}selected{% endif %}>Internship</option>
+                                    <option value="remote" {% if job.job_type == 'remote' %}selected{% endif %}>Remote</option>
+                                    <option value="freelance" {% if job.job_type == 'freelance' %}selected{% endif %}>Freelance</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="experience_level" class="form-label">Experience Level *</label>
+                                <select class="form-control" id="experience_level" name="experience_level" required>
+                                    <option value="">Select Experience Level</option>
+                                    <option value="entry" {% if job.experience_level == 'entry' %}selected{% endif %}>Entry Level</option>
+                                    <option value="mid" {% if job.experience_level == 'mid' %}selected{% endif %}>Mid Level</option>
+                                    <option value="senior" {% if job.experience_level == 'senior' %}selected{% endif %}>Senior Level</option>
+                                    <option value="lead" {% if job.experience_level == 'lead' %}selected{% endif %}>Lead/Manager</option>
+                                    <option value="executive" {% if job.experience_level == 'executive' %}selected{% endif %}>Executive</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-3 mb-3">
+                                <label for="salary_min" class="form-label">Salary Min</label>
+                                <input type="number" class="form-control" id="salary_min" name="salary_min" 
+                                    value="{{ job.salary_min|default:'' }}">
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label for="salary_max" class="form-label">Salary Max</label>
+                                <input type="number" class="form-control" id="salary_max" name="salary_max" 
+                                    value="{{ job.salary_max|default:'' }}">
+                            </div>
+                            <div class="col-md-2 mb-3">
+                                <label for="salary_currency" class="form-label">Currency</label>
+                                <select class="form-control" id="salary_currency" name="salary_currency">
+                                    <option value="">Select Currency</option>
+                                    <option value="USD" {% if job.salary_currency == 'USD' %}selected{% endif %}>USD</option>
+                                    <option value="EUR" {% if job.salary_currency == 'EUR' %}selected{% endif %}>EUR</option>
+                                    <option value="GBP" {% if job.salary_currency == 'GBP' %}selected{% endif %}>GBP</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label d-block">&nbsp;</label>
+                                <div class="form-check mt-2">
+                                    <input class="form-check-input" type="checkbox" id="is_salary_negotiable" 
+                                        name="is_salary_negotiable" {% if job.is_salary_negotiable %}checked{% endif %}>
+                                    <label class="form-check-label" for="is_salary_negotiable">Salary negotiable</label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label for="vacancies" class="form-label">Vacancies</label>
+                                <input type="number" class="form-control" id="vacancies" name="vacancies" 
+                                    value="{{ job.vacancies }}" min="1">
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="application_deadline" class="form-label">Deadline</label>
+                                <input type="datetime-local" class="form-control" id="application_deadline" 
+                                    name="application_deadline" 
+                                    value="{{ job.application_deadline|date:'Y-m-d\TH:i' }}">
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label d-block">&nbsp;</label>
+                                <div class="mt-2">
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="checkbox" id="is_remote" 
+                                            name="is_remote" {% if job.is_remote %}checked{% endif %}>
+                                        <label class="form-check-label" for="is_remote">Remote</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="checkbox" id="is_featured" 
+                                            name="is_featured" {% if job.is_featured %}checked{% endif %}>
+                                        <label class="form-check-label" for="is_featured">Featured</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Job Description -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">Job Description</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label for="description" class="form-label">Description *</label>
+                            <textarea class="form-control" id="description" name="description" rows="8" required>{{ job.description }}</textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label for="requirements" class="form-label">Requirements *</label>
+                            <textarea class="form-control" id="requirements" name="requirements" rows="8" required>{{ job.requirements }}</textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label for="benefits" class="form-label">Benefits</label>
+                            <textarea class="form-control" id="benefits" name="benefits" rows="5">{{ job.benefits }}</textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Skills -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">Skills Required</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label for="skills_required" class="form-label">Skills (comma-separated)</label>
+                            <input type="text" class="form-control" id="skills_required" name="skills_required" 
+                                value="{% for skill in job.skills_required.all %}{{ skill }}{% if not forloop.last %}, {% endif %}{% endfor %}">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Publishing Options -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">Publishing Options</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label for="status" class="form-label">Status</label>
+                            <select class="form-control" id="status" name="status">
+                                <option value="">Select Status</option>
+                                <option value="draft" {% if job.status == 'draft' %}selected{% endif %}>Draft</option>
+                                <option value="published" {% if job.status == 'published' %}selected{% endif %}>Published</option>
+                                <option value="closed" {% if job.status == 'closed' %}selected{% endif %}>Closed</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-between">
+                    <a href="{% url 'dashboard:admin_jobs' %}" class="btn btn-outline-secondary">
+                        <i class="fas fa-times me-2"></i> Cancel
+                    </a>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save me-2"></i> Update Job
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+</div>
+
+{% block extra_js %}
+<script src="https://cdn.ckeditor.com/4.20.2/standard/ckeditor.js"></script>
+<script>
+CKEDITOR.replace('description');
+CKEDITOR.replace('requirements');
+CKEDITOR.replace('benefits');
+</script>
+{% endblock %}
+{% endblock %}

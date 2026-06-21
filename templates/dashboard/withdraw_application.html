@@ -1,0 +1,352 @@
+{% extends 'dashboard/base_dashboard.html' %}
+
+{% block dashboard_page_title %}
+<!-- page-title -->
+<section class="page-title centred pt_110">
+    <div class="auto-container">
+        <div class="content-box">
+            <h1>Withdraw Application</h1>
+            <ul class="bread-crumb clearfix">
+                <li><a href="{% url "core:home" %}">Home</a></li>
+                <li>-</li>
+                <li>Withdraw Application</li>
+            </ul>
+        </div>
+    </div>
+</section>
+<!-- page-title end -->
+{% endblock %}
+{% block dashboard_content %}
+<div class="row justify-content-center">
+    <div class="col-lg-12">
+        {% if can_withdraw %}
+        <!-- Withdraw Confirmation -->
+        <div class="card shadow-sm border-danger">
+            <div class="card-header bg-danger text-white">
+                <h5 class="mb-0">
+                    <i class="fas fa-exclamation-triangle me-2"></i>Withdraw Application
+                </h5>
+            </div>
+            <div class="card-body p-4">
+                <!-- Warning Alert -->
+                <div class="alert alert-danger border-danger">
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-exclamation-circle fa-3x me-3"></i>
+                        <div>
+                            <h5 class="alert-heading mb-1">Warning: This Action is Irreversible!</h5>
+                            <p class="mb-0">Once you withdraw your application, you cannot undo this action.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- What Happens Section -->
+                <div class="alert alert-warning">
+                    <h6 class="alert-heading">
+                        <i class="fas fa-info-circle me-2"></i>What happens when you withdraw?
+                    </h6>
+                    <ul class="mb-0">
+                        <li class="mb-2">Your application will be <strong>permanently withdrawn</strong></li>
+                        <li class="mb-2">The employer will be notified of your withdrawal</li>
+                        <li class="mb-2">You will <strong>no longer be considered</strong> for this position</li>
+                        <li class="mb-2">This action <strong>cannot be undone</strong></li>
+                        <li class="mb-2">If you change your mind, you'll need to reapply (if the job is still open)</li>
+                        <li>Your application history will show this as "Withdrawn"</li>
+                    </ul>
+                </div>
+
+                <!-- Application Details -->
+                <div class="card bg-light mb-4">
+                    <div class="card-body">
+                        <h6 class="mb-3">
+                            <i class="fas fa-file-alt me-2"></i>Application Details
+                        </h6>
+                        <div class="d-flex align-items-center mb-3">
+                            {% if application.job.company_logo %}
+                            <img src="{{ application.job.company_logo.url }}" 
+                                 alt="{{ application.job.company_name }}" 
+                                 class="me-3 rounded" 
+                                 width="60" height="60" 
+                                 style="object-fit: cover;">
+                            {% else %}
+                            <div class="bg-primary text-white d-flex align-items-center justify-content-center me-3 rounded" 
+                                 style="width: 60px; height: 60px; font-size: 1.5rem;">
+                                {{ application.job.company_name|first|upper }}
+                            </div>
+                            {% endif %}
+                            <div>
+                                <strong class="fs-5">{{ application.job.title }}</strong>
+                                <br>
+                                <span class="text-muted">{{ application.job.company_name }}</span>
+                            </div>
+                        </div>
+                        
+                        <table class="table table-sm table-borderless mb-0">
+                            <tr>
+                                <td width="150"><strong>Application ID:</strong></td>
+                                <td>#{{ application.id }}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Applied On:</strong></td>
+                                <td>{{ application.applied_at|date:"F d, Y" }}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Current Status:</strong></td>
+                                <td>
+                                    <span class="badge bg-{{ application.get_status_color }}">
+                                        {{ application.get_status_display }}
+                                    </span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><strong>Location:</strong></td>
+                                <td>{{ application.job.location }}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Job Type:</strong></td>
+                                <td>{{ application.job.get_job_type_display }}</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Alternative Options -->
+                <div class="alert alert-info mb-4">
+                    <h6 class="alert-heading">
+                        <i class="fas fa-lightbulb me-2"></i>Before You Withdraw...
+                    </h6>
+                    <p class="mb-2">Consider these alternatives:</p>
+                    <ul class="mb-0">
+                        <li class="mb-1">Wait for the employer's response - they might be interested!</li>
+                        <li class="mb-1">Update your application with additional information</li>
+                        <li>Contact the employer directly if you have concerns</li>
+                    </ul>
+                </div>
+
+                <!-- Withdrawal Form -->
+                <h6 class="mb-3">Reason for Withdrawal (Optional)</h6>
+                <form method="POST" id="withdrawForm">
+                    {% csrf_token %}
+                    
+                    <div class="mb-3">
+                        <select class="form-select" name="withdraw_reason" id="withdrawReason">
+                            <option value="">Select a reason (optional)...</option>
+                            <option value="accepted_another">Accepted another job offer</option>
+                            <option value="salary_expectations">Salary/compensation expectations not met</option>
+                            <option value="location">Location not suitable</option>
+                            <option value="role_change">Changed mind about the role</option>
+                            <option value="company_research">After researching the company</option>
+                            <option value="better_opportunity">Found a better opportunity</option>
+                            <option value="personal_reasons">Personal reasons</option>
+                            <option value="other">Other (please specify)</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-4" id="otherReasonDiv" style="display: none;">
+                        <label for="other_reason" class="form-label">Please specify:</label>
+                        <textarea class="form-control" id="other_reason" name="other_reason" rows="2" 
+                                  placeholder="Please provide more details..."></textarea>
+                    </div>
+
+                    <!-- Confirmation Checkbox -->
+                    <div class="card bg-light mb-4">
+                        <div class="card-body">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="confirmUnderstand" required>
+                                <label class="form-check-label" for="confirmUnderstand">
+                                    <strong>I understand that:</strong>
+                                    <ul class="mt-2 mb-0">
+                                        <li class="mb-1">My application will be permanently withdrawn</li>
+                                        <li class="mb-1">I will no longer be considered for this position</li>
+                                        <li class="mb-1">This action cannot be reversed</li>
+                                        <li>I may need to reapply if I change my mind</li>
+                                    </ul>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-check mb-4 p-3 border rounded bg-light">
+                        <input class="form-check-input" type="checkbox" id="finalConfirm" required>
+                        <label class="form-check-label" for="finalConfirm">
+                            <strong class="text-danger">
+                                I am absolutely sure. I want to withdraw my application for 
+                                {{ application.job.title }} at {{ application.job.company_name }}.
+                            </strong>
+                        </label>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="d-flex justify-content-between align-items-center pt-3 border-top">
+                        <a href="{% url 'dashboard:application_detail' application.id %}" 
+                           class="btn btn-outline-secondary btn-lg">
+                            <i class="fas fa-arrow-left me-2"></i>Go Back to Application
+                        </a>
+                        <div>
+                            <button type="button" class="btn btn-outline-danger btn-lg me-2" 
+                                    onclick="history.back()">
+                                Cancel
+                            </button>
+                            <button type="submit" class="btn btn-danger btn-lg" id="submitWithdraw" disabled>
+                                <i class="fas fa-exclamation-triangle me-2"></i>
+                                Withdraw Application
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+        {% else %}
+        <!-- Cannot Withdraw -->
+        <div class="card shadow-sm">
+            <div class="card-header bg-secondary text-white">
+                <h5 class="mb-0">
+                    <i class="fas fa-lock me-2"></i>Cannot Withdraw Application
+                </h5>
+            </div>
+            <div class="card-body text-center p-5">
+                <i class="fas fa-lock fa-5x text-muted mb-4"></i>
+                <h4>Application Cannot Be Withdrawn</h4>
+                <p class="text-muted lead mb-4">
+                    This application cannot be withdrawn because its current status is 
+                    <span class="badge bg-{{ application.get_status_color }} fs-6">
+                        {{ application.get_status_display }}
+                    </span>
+                </p>
+                <div class="alert alert-info text-start">
+                    <h6 class="alert-heading">
+                        <i class="fas fa-info-circle me-2"></i>Why can't I withdraw?
+                    </h6>
+                    <p class="mb-0">
+                        Applications can only be withdrawn when they are in one of these statuses:
+                    </p>
+                    <ul class="mb-0 mt-2">
+                        <li>Pending Review</li>
+                        <li>Reviewed</li>
+                        <li>Shortlisted</li>
+                        <li>Interviewed</li>
+                        <li>Offered</li>
+                    </ul>
+                </div>
+                <div class="mt-4">
+                    <a href="{% url 'dashboard:application_detail' application.id %}" 
+                       class="btn btn-primary btn-lg">
+                        <i class="fas fa-arrow-left me-2"></i>Back to Application
+                    </a>
+                    <a href="{% url 'dashboard:my_applications' %}" 
+                       class="btn btn-outline-secondary btn-lg ms-2">
+                        <i class="fas fa-list me-2"></i>View All Applications
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+// Enable submit button only when both checkboxes are checked
+const confirmUnderstand = document.getElementById('confirmUnderstand');
+const finalConfirm = document.getElementById('finalConfirm');
+const submitBtn = document.getElementById('submitWithdraw');
+
+function updateSubmitButton() {
+    if (confirmUnderstand && finalConfirm && submitBtn) {
+        submitBtn.disabled = !(confirmUnderstand.checked && finalConfirm.checked);
+    }
+}
+
+if (confirmUnderstand) {
+    confirmUnderstand.addEventListener('change', updateSubmitButton);
+}
+
+if (finalConfirm) {
+    finalConfirm.addEventListener('change', updateSubmitButton);
+}
+
+// Show/hide other reason textarea
+const withdrawReason = document.getElementById('withdrawReason');
+const otherReasonDiv = document.getElementById('otherReasonDiv');
+
+if (withdrawReason) {
+    withdrawReason.addEventListener('change', function() {
+        if (this.value === 'other') {
+            otherReasonDiv.style.display = 'block';
+        } else {
+            otherReasonDiv.style.display = 'none';
+            document.getElementById('other_reason').value = '';
+        }
+    });
+}
+
+// Double confirmation before submit
+const withdrawForm = document.getElementById('withdrawForm');
+if (withdrawForm) {
+    withdrawForm.addEventListener('submit', function(e) {
+        const confirmed = confirm(
+            '⚠️ FINAL WARNING ⚠️\n\n' +
+            'Are you absolutely sure you want to withdraw your application?\n\n' +
+            'This action:\n' +
+            '• Cannot be undone\n' +
+            '• Will permanently remove you from consideration\n' +
+            '• Will notify the employer\n\n' +
+            'Click "OK" to withdraw or "Cancel" to keep your application.'
+        );
+        
+        if (!confirmed) {
+            e.preventDefault();
+            return false;
+        }
+        
+        // Show loading state
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Withdrawing...';
+    });
+}
+
+// Add animation to warning
+document.addEventListener('DOMContentLoaded', function() {
+    const warningAlert = document.querySelector('.alert-danger.border-danger');
+    if (warningAlert) {
+        warningAlert.style.animation = 'pulse 2s infinite';
+    }
+});
+</script>
+
+<style>
+@keyframes pulse {
+    0% {
+        box-shadow: 0 0 0 0 rgba(220, 53, 69, 0.4);
+    }
+    70% {
+        box-shadow: 0 0 0 10px rgba(220, 53, 69, 0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(220, 53, 69, 0);
+    }
+}
+
+.alert-danger.border-danger {
+    animation: pulse 2s infinite;
+}
+
+.form-check-input:checked {
+    background-color: #dc3545;
+    border-color: #dc3545;
+}
+
+#submitWithdraw:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+}
+
+.card {
+    border-radius: 10px;
+}
+
+.list-unstyled li {
+    line-height: 1.8;
+}
+</style>
+{% endblock %}
+{% endblock %}

@@ -1,0 +1,862 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+
+    <title>{% block title %}{{ site_name }}{% endblock %}</title>
+
+    <!-- Fav Icon -->
+     {% if site_favicon %}
+    <link rel="icon" type="image/x-icon" href="{{ site_favicon.url }}">
+    {% endif %}
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&amp;display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&amp;family=Outfit:wght@100..900&amp;display=swap"
+        rel="stylesheet">
+
+    <!-- Stylesheets -->
+    <link href="{% static 'css/font-awesome-all.css' %}" rel="stylesheet">
+    <link href="{% static 'css/flaticon.css' %}" rel="stylesheet">
+    <link href="{% static 'css/owl.css' %}" rel="stylesheet">
+    <link href="{% static 'css/bootstrap.css' %}" rel="stylesheet">
+    <link href="{% static 'css/jquery.fancybox.min.css' %}" rel="stylesheet">
+    <link href="{% static 'css/animate.css' %}" rel="stylesheet">
+    <link href="{% static 'css/nice-select.css' %}" rel="stylesheet">
+    <link href="{% static 'css/odometer.css' %}" rel="stylesheet">
+    <link href="{% static 'css/elpath.css' %}" rel="stylesheet">
+    <link href="{% static 'css/color.css' %}" id="jssDefault" rel="stylesheet">
+    <link href="{% static 'css/rtl.css' %}" rel="stylesheet">
+    <link href="{% static 'css/style.css' %}" rel="stylesheet">
+    <link href="{% static 'css/module-css/header.css' %}" rel="stylesheet">
+    <link href="{% static 'css/module-css/banner.css' %}" rel="stylesheet">
+    <link href="{% static 'css/module-css/clients.css' %}" rel="stylesheet">
+    <link href="{% static 'css/module-css/about.css' %}" rel="stylesheet">
+    <link href="{% static 'css/module-css/funfact.css' %}" rel="stylesheet">
+    <link href="{% static 'css/module-css/chooseus.css' %}" rel="stylesheet">
+    <link href="{% static 'css/module-css/category.css' %}" rel="stylesheet">
+    <link href="{% static 'css/module-css/industries.css' %}" rel="stylesheet">
+    <link href="{% static 'css/module-css/process.css' %}" rel="stylesheet">
+    <link href="{% static 'css/module-css/team.css' %}" rel="stylesheet">
+    <link href="{% static 'css/module-css/news.css' %}" rel="stylesheet">
+    <link href="{% static 'css/module-css/subscribe.css' %}" rel="stylesheet">
+    <link href="{% static 'css/module-css/footer.css' %}" rel="stylesheet">
+    <link href="{% static 'css/responsive.css' %}" rel="stylesheet">
+    <link href="{% static 'css/module-css/job.css' %}" rel="stylesheet">
+    <link href="{% static 'css/module-css/service-details.css' %}" rel="stylesheet">
+    <link href="{% static 'css/module-css/about.css' %}" rel="stylesheet">
+    <link href="{% static 'css/module-css/contact.css' %}" rel="stylesheet">
+    <link href="{% static 'css/module-css/blog-sidebar.css' %}" rel="stylesheet">
+    <link href="{% static 'css/module-css/blog-details.css' %}" rel="stylesheet">
+    <link href="{% static 'css/module-css/page-title.css' %}" rel="stylesheet">
+    <link href="{% static 'css/module-css/job-details.css' %}" rel="stylesheet">
+    <link href="{% static 'css/module-css/service-details.css' %}" rel="stylesheet">
+
+
+    <style>
+        /* Preloader Styles */
+        .loader-wrap {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 99999;
+            background: rgba(255, 255, 255, 0.97);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.5s ease;
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+        }
+
+        .preloader {
+            text-align: center;
+            position: relative;
+            max-width: 400px;
+            width: 90%;
+        }
+
+        .preloader-close {
+            position: absolute;
+            top: -50px;
+            right: 0;
+            width: 35px;
+            height: 35px;
+            background: #dc3545;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 14px;
+            z-index: 10;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .preloader-close:hover {
+            background: #bb2d3b;
+            transform: scale(1.1) rotate(90deg);
+            box-shadow: 0 4px 15px rgba(220, 53, 69, 0.4);
+        }
+
+        .preloader-close:active {
+            transform: scale(0.95);
+        }
+
+        /* Spinner Animation */
+        .spinner {
+            width: 60px;
+            height: 60px;
+            border: 3px solid #e9ecef;
+            border-top: 3px solid #0d6efd;
+            border-right: 3px solid #6610f2;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 25px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Loading Text Animation */
+        .txt-loading {
+            display: flex;
+            justify-content: center;
+            gap: 3px;
+            flex-wrap: wrap;
+        }
+
+        .letters-loading {
+            font-size: 20px;
+            font-weight: 700;
+            color: #0d6efd;
+            text-transform: uppercase;
+            display: inline-block;
+            animation: letterBounce 1.8s ease-in-out infinite;
+        }
+
+        /* Staggered animation delays */
+        .letters-loading:nth-child(1) { animation-delay: 0.00s; color: #0d6efd; }
+        .letters-loading:nth-child(2) { animation-delay: 0.05s; color: #1a56db; }
+        .letters-loading:nth-child(3) { animation-delay: 0.10s; color: #1e40af; }
+        .letters-loading:nth-child(4) { animation-delay: 0.15s; color: #2563eb; }
+        .letters-loading:nth-child(5) { animation-delay: 0.20s; }
+        .letters-loading:nth-child(6) { animation-delay: 0.25s; color: #3b82f6; }
+        .letters-loading:nth-child(7) { animation-delay: 0.30s; color: #60a5fa; }
+        .letters-loading:nth-child(8) { animation-delay: 0.35s; color: #0d6efd; }
+        .letters-loading:nth-child(9) { animation-delay: 0.40s; color: #1a56db; }
+        .letters-loading:nth-child(10) { animation-delay: 0.45s; color: #1e40af; }
+        .letters-loading:nth-child(11) { animation-delay: 0.50s; color: #2563eb; }
+        .letters-loading:nth-child(12) { animation-delay: 0.55s; }
+        .letters-loading:nth-child(13) { animation-delay: 0.60s; color: #3b82f6; }
+        .letters-loading:nth-child(14) { animation-delay: 0.65s; color: #60a5fa; }
+        .letters-loading:nth-child(15) { animation-delay: 0.70s; color: #0d6efd; }
+        .letters-loading:nth-child(16) { animation-delay: 0.75s; color: #1a56db; }
+        .letters-loading:nth-child(17) { animation-delay: 0.80s; color: #1e40af; }
+        .letters-loading:nth-child(18) { animation-delay: 0.85s; color: #2563eb; }
+        .letters-loading:nth-child(19) { animation-delay: 0.90s; }
+        .letters-loading:nth-child(20) { animation-delay: 0.95s; color: #3b82f6; }
+
+        @keyframes letterBounce {
+            0%, 100% { 
+                transform: translateY(0); 
+                opacity: 1;
+            }
+            25% { 
+                transform: translateY(-8px); 
+                opacity: 0.5;
+            }
+            50% { 
+                transform: translateY(0); 
+                opacity: 1;
+            }
+            75% { 
+                transform: translateY(3px); 
+                opacity: 0.7;
+            }
+        }
+
+        /* Loading message */
+        .loading-text {
+            color: #6c757d;
+            font-size: 13px;
+            margin-top: 20px;
+        }
+
+        .loading-text small {
+            animation: fadeInOut 2s ease-in-out infinite;
+        }
+
+        @keyframes fadeInOut {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 1; }
+        }
+
+        /* Mobile responsive */
+        @media (max-width: 576px) {
+            .letters-loading {
+                font-size: 16px;
+            }
+            
+            .spinner {
+                width: 45px;
+                height: 45px;
+                border-width: 2px;
+            }
+            
+            .preloader-close {
+                top: -40px;
+                width: 30px;
+                height: 30px;
+                font-size: 12px;
+            }
+        }
+
+        /* Reduced motion preference */
+        @media (prefers-reduced-motion: reduce) {
+            .spinner {
+                animation-duration: 2s;
+            }
+            
+            .letters-loading {
+                animation: none;
+            }
+        }
+    </style>
+
+</head>
+
+
+<!-- page wrapper -->
+
+<body>
+
+    <div class="boxed_wrapper ltr">
+
+
+        <!-- preloader -->
+        <!-- Smart Preloader -->
+        <div class="loader-wrap" id="smartPreloader" style="display: none;">
+            <div class="preloader">
+                <div class="preloader-close" id="preloaderClose">
+                    <i class="fas fa-times"></i>
+                </div>
+                <div id="handle-preloader" class="handle-preloader">
+                    <div class="animation-preloader">
+                        <div class="spinner"></div>
+                        <div class="txt-loading">
+                            <span data-text-preloader="D" class="letters-loading">D</span>
+                            <span data-text-preloader="a" class="letters-loading">a</span>
+                            <span data-text-preloader="t" class="letters-loading">t</span>
+                            <span data-text-preloader="a" class="letters-loading">a</span>
+                            <span data-text-preloader=" " class="letters-loading"> </span>
+                            <span data-text-preloader="C" class="letters-loading">C</span>
+                            <span data-text-preloader="e" class="letters-loading">e</span>
+                            <span data-text-preloader="n" class="letters-loading">n</span>
+                            <span data-text-preloader="t" class="letters-loading">t</span>
+                            <span data-text-preloader="e" class="letters-loading">e</span>
+                            <span data-text-preloader="r" class="letters-loading">r</span>
+                            <span data-text-preloader=" " class="letters-loading"> </span>
+                            <span data-text-preloader="R" class="letters-loading">R</span>
+                            <span data-text-preloader="e" class="letters-loading">e</span>
+                            <span data-text-preloader="c" class="letters-loading">c</span>
+                            <span data-text-preloader="r" class="letters-loading">r</span>
+                            <span data-text-preloader="u" class="letters-loading">u</span>
+                            <span data-text-preloader="i" class="letters-loading">i</span>
+                            <span data-text-preloader="t" class="letters-loading">t</span>
+                        </div>
+                        <div class="loading-text mt-3">
+                            <small class="text-muted" id="loadingMessage">Loading your experience...</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- preloader end -->
+
+
+        <!--Search Popup-->
+        <div id="search-popup" class="search-popup">
+            <div class="popup-inner">
+                <div class="upper-box">
+                    <figure class="logo-box"><a href="index.html"><img src="../logo2.jpeg" alt=""></a></figure>
+                    <div class="close-search"><span class="icon-27"></span></div>
+                </div>
+                <div class="overlay-layer"></div>
+                <div class="auto-container">
+                    <div class="search-form">
+                        <form method="post" action="#">
+                            <div class="form-group">
+                                <fieldset>
+                                    <input type="search" class="form-control" name="search-input" value=""
+                                        placeholder="Type your keyword and hit" required>
+                                    <button type="submit"><i class="icon-1"></i></button>
+                                </fieldset>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- main header -->
+        <header class="main-header {% if request.resolver_match.url_name == 'home' and request.resolver_match.namespace == 'core' %}header-style-one{% else %}header-style-three{% endif %}">
+            <!-- header-lower -->
+            <div class="header-lower">
+                <div class="auto-container">
+                    <div class="outer-box">
+                        <figure class="logo-box pl_15">
+                            <a href="{% url 'core:home' %}" aria-label="Home - {{ site_name }}">
+                                {% if site_logo %}
+                                <img src="{{ site_logo.url }}" alt="{{ site_name }} - Logo" loading="eager" width="180"
+                                    height="60">
+                                {% else %}
+                                <strong>{{ site_name }}</strong>
+                                {% endif %}
+                            </a>
+                        </figure>
+                        <div class="menu-area">
+                            <!--Mobile Navigation Toggler-->
+                            <div class="mobile-nav-toggler">
+                                <i class="icon-bar"></i>
+                                <i class="icon-bar"></i>
+                                <i class="icon-bar"></i>
+                            </div>
+                            <nav class="main-menu navbar-expand-md navbar-light clearfix">
+                                <div class="collapse navbar-collapse show clearfix" id="navbarSupportedContent">
+                                    <ul class="navigation clearfix">
+                                        <li class="{% if request.resolver_match.url_name == 'home' and request.resolver_match.namespace == 'core' %}current{% endif %}">
+                                            <a href="{% url 'core:home' %}">Home</a>
+                                        </li>
+                                        <li class="{% if request.resolver_match.url_name == 'about' and request.resolver_match.namespace == 'core' %}current{% endif %}">
+                                            <a href="{% url 'core:about' %}">About</a>
+                                        </li>
+                                        <li class="{% if request.resolver_match.url_name == 'job_list' and request.resolver_match.namespace == 'jobs' %}current{% endif %}">
+                                            <a href="{% url 'jobs:job_list' %}">Job Listings</a>
+                                        </li>
+                                        <li class="{% if request.resolver_match.url_name == 'post_list' and request.resolver_match.namespace == 'blog' %}current{% endif %}">
+                                            <a href="{% url 'blog:post_list' %}">Blog</a>
+                                        </li>
+                                        <li class="{% if request.resolver_match.url_name == 'contact' and request.resolver_match.namespace == 'core' %}current{% endif %}">
+                                            <a href="{% url 'core:contact' %}">Contact</a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </nav>
+                        </div>
+                        <div class="menu-right-content">
+                            <div class="search-btn mr_20">
+                                <button class="search-toggler"><i class="icon-1"></i></button>
+                            </div>
+                            {% if user.is_authenticated %}
+                            <div class="btn-box">
+                                <a href="{% url 'dashboard:redirect_dashboard' %}" class="theme-btn btn-one">
+                                    {% if user.profile_picture %}
+                                    <img src="{{ user.profile_picture.url }}" alt="{{ user.get_full_name }}" class="rounded-circle me-1" width="30" height="30">
+                                    {% endif %}
+                                    {{ user.get_full_name|default:user.email }} - Dashboard
+                                </a>
+                            </div>
+                            {% else %}
+                            <div class="link-box mr_20"><a href="{% url 'account_login' %}">Log In</a></div>
+                            <div class="btn-box"><a href="{% url 'account_signup' %}" class="theme-btn btn-one">Sign Up</a></div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!--sticky Header-->
+            <div class="sticky-header">
+                <div class="auto-container">
+                    <div class="outer-box">
+                        <figure class="logo-box pl_15">
+                            <a href="{% url 'core:home' %}" aria-label="Home - {{ site_name }}">
+                                {% if site_logo %}
+                                <img src="{{ site_logo.url }}" alt="{{ site_name }} - Logo" loading="eager" width="180"
+                                    height="60">
+                                {% else %}
+                                <strong>{{ site_name }}</strong>
+                                {% endif %}
+                            </a>
+                        </figure>
+                        <div class="menu-area">
+                            <nav class="main-menu clearfix">
+                                <!--Keep This Empty / Menu will come through Javascript-->
+                            </nav>
+                        </div>
+                        <div class="menu-right-content">
+                            <div class="search-btn mr_20">
+                                <button class="search-toggler"><i class="icon-1"></i></button>
+                            </div>
+                            {% if user.is_authenticated %}
+                            <div class="btn-box">
+                                <a href="{% url 'dashboard:redirect_dashboard' %}" class="theme-btn btn-one">
+                                    {% if user.profile_picture %}
+                                    <img src="{{ user.profile_picture.url }}" alt="{{ user.get_full_name }}" class="rounded-circle me-1" width="30" height="30">
+                                    {% endif %}
+                                    {{ user.get_full_name|default:user.email }} - Dashboard
+                                </a>
+                            </div>
+                            {% else %}
+                            <div class="link-box mr_20"><a href="{% url 'account_login' %}">Log In</a></div>
+                            <div class="btn-box"><a href="{% url 'account_signup' %}" class="theme-btn btn-one">Sign Up</a></div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+        <!-- main-header end -->
+
+
+        <!-- Mobile Menu  -->
+        <div class="mobile-menu">
+            <div class="menu-backdrop"></div>
+            <div class="close-btn"><i class="fas fa-times"></i></div>
+            <nav class="menu-box">
+                <div class="nav-logo">
+                    <a href="index.html" aria-label="Home - Company Name">
+                        <img src="assets/images/logo3.jpeg" alt="Company Logo" loading="eager" width="180" height="60">
+                    </a>
+                </div>
+                <div class="menu-outer">
+                    <!--Here Menu Will Come Automatically Via Javascript / Same Menu as in Header-->
+                </div>
+                <div class="contact-info">
+                    <h4>Contact Info</h4>
+                    <ul>
+                        <li>Chicago 12, Melborne City, USA</li>
+                        <li><a href="tel:+8801682648101">+88 01682648101</a></li>
+                        <li><a href="mailto:info@example.com">info@datacentrerecruit.com</a></li>
+                    </ul>
+                </div>
+                <div class="social-links">
+                    <ul class="clearfix">
+                        <li><a href="index.html"><span class="fab fa-twitter"></span></a></li>
+                        <li><a href="index.html"><span class="fab fa-facebook-square"></span></a></li>
+                        <li><a href="index.html"><span class="fab fa-pinterest-p"></span></a></li>
+                        <li><a href="index.html"><span class="fab fa-instagram"></span></a></li>
+                        <li><a href="index.html"><span class="fab fa-youtube"></span></a></li>
+                    </ul>
+                </div>
+            </nav>
+        </div>
+        <!-- End Mobile Menu -->
+
+        <!-- Messages -->
+        {% if messages %}
+        <div class="container mt-3 z-3 rounded-3" style="position: relative; z-index: 9999;">
+            {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+
+        {% block content %}{% endblock %}
+
+
+        <!-- subscribe-style-two -->
+        <section class="subscribe-style-two">
+            <div class="bg-color"></div>
+            <div class="auto-container">
+                <div class="inner-container">
+                    <div class="shape-box">
+                        <div class="shape-1" style="background-image: url(assets/images/shape/shape-8.png);"></div>
+                        <div class="shape-2" style="background-image: url(assets/images/shape/shape-9.png);"></div>
+                    </div>
+                    <div class="text-box">
+                        <h2>Subscribe for <span>latest update</span></h2>
+                    </div>
+                    <div class="form-inner">
+                        <form method="post" action="https://azim.hostlin.com/Jobaway/contact.html">
+                            <div class="form-group">
+                                <input type="email" name="email" placeholder="Email Address" required>
+                                <button type="submit" class="theme-btn btn-one">Subscribe</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- subscribe-style-two end -->
+
+
+        <!-- main-footer -->
+        <footer class="main-footer home-2">
+            <div class="widget-section p_relative pt_80 pb_100">
+                <div class="auto-container">
+                    <div class="row clearfix">
+                        <div class="col-lg-4 col-md-6 col-sm-12 footer-column">
+                            <div class="footer-widget logo-widget mr_30">
+                                <figure class="footer-logo mb_20">
+                                    <a href="{% url 'core:home' %}">
+                                        {% if site_logo %}
+                                        <img src="{{ site_logo.url }}" alt="{{ site_name }} - Logo" loading="eager">
+                                        {% else %}
+                                        <strong>{{ site_name }}</strong>
+                                        {% endif %}
+                                    </a>
+                                <p>{{ site_settings.footer_text|default:site_settings.tagline }}</p>
+                            </div>
+                        </div>
+                        <div class="col-lg-2 col-md-4 col-sm-12 footer-column">
+                            <div class="footer-widget links-widget">
+                                <div class="widget-title">
+                                    <h4>Quick Links</h4>
+                                </div>
+                                <div class="widget-content">
+                                    <ul class="links-list clearfix">
+                                        <li><a href="{% url 'core:about' %}">About Us</a></li>
+                                        <li><a href="{% url 'core:contact' %}">Contact Us</a></li>
+                                        <li><a href="{% url 'blog:post_list' %}">Blog</a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-3 col-sm-12 footer-column">
+                            <div class="footer-widget links-widget">
+                                <div class="widget-title">
+                                    <h4>For Jobseekers</h4>
+                                </div>
+                                <div class="widget-content">
+                                    <ul class="links-list clearfix">
+                                        <li><a href="{% url 'jobs:job_list' %}">Job Listings</a></li>
+                                        <li><a href="job-listening.html">Job Categories</a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-3 col-sm-12 footer-column">
+                            <div class="footer-widget links-widget">
+                                <div class="widget-title">
+                                    <h4>Help & Support</h4>
+                                </div>
+                                <div class="widget-content">
+                                    <ul class="links-list clearfix">
+                                        <li><a href="contact.html">Contact Us</a></li>
+                                        <li><a href="#">General FAQ</a></li>
+                                        <li><a href="#">Support Center</a></li>
+                                        <li><a href="#">Privacy Policy</a></li>
+                                        <li><a href="#">Terms & Conditions</a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <div class="auto-container">
+                    <div class="bottom-inner">
+                        <div class="copyright">
+                            <p>{{ site_settings.copyright_text }}</a> All rights reserved.
+                            </p>
+                        </div>
+                        {% if site_settings.facebook or site_settings.twitter or site_settings.linkedin %}
+                        <ul class="social-links">
+                            <li>
+                                <h5>Follow Us On:</h5>
+                            </li>
+                            
+                            {% if site_settings.facebook %}
+                            <li><a href="{{ site_settings.facebook }}" target="_blank"><i class="icon-22"></i></a></li>
+                            {% endif %}
+                            {% if site_settings.twitter %}
+                            <li><a href="{{ site_settings.twitter }}" target="_blank"><i class="icon-23"></i></a></li>
+                            {% endif %}
+                            {% if site_settings.linkedin %}
+                            <li><a href="{{ site_settings.linkedin }}" target="_blank"><i class="icon-24"></i></a></li>
+                            {% endif %}
+                            {% if site_settings.instagram %}
+                            <li><a href="{{ site_settings.instagram }}" target="_blank"><i class="icon-25"></i></a></li>
+                            {% endif %}
+                        </ul>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </footer>
+        <!-- main-footer end -->
+
+
+
+        <!--Scroll to top-->
+        <div class="scroll-to-top">
+            <svg class="scroll-top-inner" viewBox="-1 -1 102 102">
+                <path d="M50,1 a49,49 0 0,1 0,98 a49,49 0 0,1 0,-98" />
+            </svg>
+        </div>
+
+    </div>
+
+
+    <!-- jequery plugins -->
+    <script src="{% static 'js/jquery.js' %}"></script>
+    <script src="{% static 'js/bootstrap.min.js' %}"></script>
+    <script src="{% static 'js/owl.js' %}"></script>
+    <script src="{% static 'js/wow.js' %}"></script>
+    <script src="{% static 'js/validation.js' %}"></script>
+    <script src="{% static 'js/jquery.fancybox.js' %}"></script>
+    <script src="{% static 'js/appear.js' %}"></script>
+    <script src="{% static 'js/isotope.js' %}"></script>
+    <script src="{% static 'js/parallax-scroll.js' %}"></script>
+    <script src="{% static 'js/jquery.nice-select.min.js' %}"></script>
+    <script src="{% static 'js/scrolltop.min.js' %}"></script>
+    <script src="{% static 'js/gsap.js' %}"></script>
+    <script src="{% static 'js/ScrollTrigger.js' %}"></script>
+    <script src="{% static 'js/SplitText.js' %}"></script>
+    <script src="{% static 'js/language.js' %}"></script>
+    <script src="{% static 'js/jquery-ui.js' %}"></script>
+    <script src="{% static 'js/lenis.min.js' %}"></script>
+    <script src="{% static 'js/odometer.js' %}"></script>
+
+    <!-- main-js -->
+    <script src="{% static 'js/script.js' %}"></script>
+
+        <!-- Extra JS Block -->
+    {% block extra_js %}{% endblock %}
+
+    <script>
+        (function() {
+            'use strict';
+            
+            var preloader = document.getElementById('smartPreloader');
+            var closeBtn = document.getElementById('preloaderClose');
+            var loadingMessage = document.getElementById('loadingMessage');
+            
+            // Constants
+            var INACTIVITY_TIMEOUT = 3 * 60 * 1000; // 3 minutes in milliseconds
+            var PRELOADER_DISPLAY_TIME = 5000; // Maximum 5 seconds display time
+            
+            // Get today's date as a string key
+            function getTodayKey() {
+                var now = new Date();
+                return now.getFullYear() + '-' + (now.getMonth() + 1) + '-' + now.getDate();
+            }
+            
+            // Check if preloader was shown today
+            function wasShownToday() {
+                var lastShownDate = localStorage.getItem('preloaderLastShownDate');
+                var today = getTodayKey();
+                return lastShownDate === today;
+            }
+            
+            // Mark preloader as shown today
+            function markShownToday() {
+                localStorage.setItem('preloaderLastShownDate', getTodayKey());
+            }
+            
+            // Get last activity time
+            function getLastActivity() {
+                var lastActivity = localStorage.getItem('lastActivityTime');
+                return lastActivity ? parseInt(lastActivity) : null;
+            }
+            
+            // Update last activity time
+            function updateLastActivity() {
+                localStorage.setItem('lastActivityTime', Date.now().toString());
+            }
+            
+            // Check if user was inactive for more than the timeout
+            function wasInactive() {
+                var lastActivity = getLastActivity();
+                if (!lastActivity) {
+                    return true; // First visit ever
+                }
+                
+                var now = Date.now();
+                var inactiveDuration = now - lastActivity;
+                
+                console.log('Inactive for:', Math.round(inactiveDuration / 1000), 'seconds');
+                
+                return inactiveDuration > INACTIVITY_TIMEOUT;
+            }
+            
+            // Show preloader
+            function showPreloader(message) {
+                if (preloader) {
+                    preloader.style.display = 'flex';
+                    preloader.style.opacity = '1';
+                    
+                    if (loadingMessage && message) {
+                        loadingMessage.textContent = message;
+                    }
+                    
+                    console.log('Preloader shown:', message);
+                }
+            }
+            
+            // Hide preloader with animation
+            function hidePreloader() {
+                if (preloader) {
+                    preloader.style.opacity = '0';
+                    preloader.style.transition = 'opacity 0.5s ease';
+                    
+                    setTimeout(function() {
+                        preloader.style.display = 'none';
+                        console.log('Preloader hidden');
+                    }, 500);
+                }
+            }
+            
+            // Main initialization
+            function initSmartPreloader() {
+                var shouldShow = false;
+                var message = 'Loading your experience...';
+                
+                // Check conditions
+                var shownToday = wasShownToday();
+                var inactive = wasInactive();
+                
+                console.log('Shown today:', shownToday, '| Was inactive:', inactive);
+                
+                // Show preloader if:
+                // 1. Not shown today (first visit of the day)
+                // 2. User was inactive for more than 3 minutes
+                
+                if (!shownToday) {
+                    shouldShow = true;
+                    message = 'Welcome! Preparing your experience for today...';
+                    console.log('First visit today - showing preloader');
+                } else if (inactive) {
+                    shouldShow = true;
+                    message = 'Welcome back! Refreshing your experience...';
+                    console.log('Returning after inactivity - showing preloader');
+                }
+                
+                if (shouldShow) {
+                    showPreloader(message);
+                    
+                    // Mark as shown today
+                    markShownToday();
+                    
+                    // Update activity time
+                    updateLastActivity();
+                    
+                    // Hide after page loads
+                    window.addEventListener('load', function() {
+                        setTimeout(function() {
+                            hidePreloader();
+                        }, 800);
+                    });
+                    
+                    // Safety timeout - hide after max display time
+                    setTimeout(function() {
+                        var preloaderEl = document.getElementById('smartPreloader');
+                        if (preloaderEl && preloaderEl.style.display !== 'none') {
+                            console.log('Safety timeout - hiding preloader');
+                            hidePreloader();
+                        }
+                    }, PRELOADER_DISPLAY_TIME);
+                    
+                } else {
+                    // Update activity time without showing preloader
+                    updateLastActivity();
+                    
+                    // Ensure preloader is hidden
+                    if (preloader) {
+                        preloader.style.display = 'none';
+                    }
+                    console.log('Preloader not needed');
+                }
+            }
+            
+            // Close button handler
+            if (closeBtn) {
+                closeBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    hidePreloader();
+                    // Still mark as shown and update activity
+                    markShownToday();
+                    updateLastActivity();
+                });
+            }
+            
+            // Track user activity
+            var activityEvents = [
+                'mousedown', 'mousemove', 'keydown', 
+                'scroll', 'touchstart', 'click', 'keypress'
+            ];
+            
+            activityEvents.forEach(function(eventName) {
+                document.addEventListener(eventName, function() {
+                    updateLastActivity();
+                }, { passive: true });
+            });
+            
+            // Handle page visibility changes
+            document.addEventListener('visibilitychange', function() {
+                if (document.hidden) {
+                    // User left the page - record the time
+                    localStorage.setItem('pageHiddenTime', Date.now().toString());
+                    console.log('Page hidden - recording time');
+                } else {
+                    // User came back - check if enough time passed
+                    var hiddenTime = localStorage.getItem('pageHiddenTime');
+                    if (hiddenTime) {
+                        var now = Date.now();
+                        var awayDuration = now - parseInt(hiddenTime);
+                        
+                        console.log('Away for:', Math.round(awayDuration / 1000), 'seconds');
+                        
+                        if (awayDuration > INACTIVITY_TIMEOUT) {
+                            // User was away for more than 3 minutes
+                            showPreloader('Welcome back! Refreshing...');
+                            markShownToday();
+                            updateLastActivity();
+                            
+                            setTimeout(function() {
+                                hidePreloader();
+                            }, 2000);
+                        }
+                        
+                        localStorage.removeItem('pageHiddenTime');
+                    }
+                    
+                    updateLastActivity();
+                }
+            });
+            
+            // Handle before unload - update activity time
+            window.addEventListener('beforeunload', function() {
+                updateLastActivity();
+            });
+            
+            // Initialize
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', initSmartPreloader);
+            } else {
+                initSmartPreloader();
+            }
+            
+            // Debug: Log current state
+            console.log('=== Preloader State ===');
+            console.log('Today Key:', getTodayKey());
+            console.log('Last Shown Date:', localStorage.getItem('preloaderLastShownDate'));
+            console.log('Last Activity:', getLastActivity() ? new Date(getLastActivity()).toLocaleString() : 'Never');
+            console.log('Was Inactive:', wasInactive());
+            console.log('======================');
+            
+        })();
+    </script>
+
+</body><!-- End of .page_wrapper -->
+
+</html>

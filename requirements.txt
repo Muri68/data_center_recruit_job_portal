@@ -1,0 +1,17 @@
+Django
+django-allauth
+django-ckeditor-5
+django-crispy-forms
+crispy-bootstrap5
+dj-database-url
+psycopg2-binary
+python-decouple
+pillow
+django-filter
+django-taggit
+django-widget-tweaks
+whitenoise
+gunicorn
+PyJWT
+requests
+cryptography

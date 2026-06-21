@@ -1,0 +1,193 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+   <meta charset="utf-8">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0">
+   <title>Dashboard</title>
+   <!-- Fav Icon -->
+     {% if site_favicon %}
+        <link rel="icon" type="image/x-icon" href="{{ site_favicon.url }}">
+    {% endif %}
+   <link rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,500;0,600;0,700;1,400&amp;display=swap">
+   <link rel="stylesheet" href="{% static 'assets/plugins/bootstrap/css/bootstrap.min.css' %}">
+   <link rel="stylesheet" href="{% static 'assets/plugins/fontawesome/css/fontawesome.min.css' %}">
+   <link rel="stylesheet" href="{% static 'assets/plugins/fontawesome/css/all.min.css' %}">
+   <link rel="stylesheet" href="{% static 'assets/css/style.css' %}">
+</head>
+
+<body>
+   <div class="main-wrapper">
+      <div class="header">
+         <div class="header-left">
+            {% if site_logo %}
+                <a href="{% url 'dashboard:redirect_dashboard' %}" aria-label="Home - Company Name" class="logo">
+                <img src="{{ site_logo.url }}" alt="{{ site_name }} - Logo" loading="eager" width="180"
+                    height="60">
+                </a>
+                <a href="{% url 'dashboard:redirect_dashboard' %}" aria-label="Home - Company Name" class="logo logo-small">
+                <img src="{{ site_logo.url }}" alt="{{ site_name }} - Logo" loading="eager" width="180"
+                    height="60">
+                </a>
+                {% else %}
+                <strong>{{ site_name }}</strong>
+                {% endif %}
+            
+         </div>
+         <a href="javascript:void(0);" id="toggle_btn">
+            <i class="fas fa-align-left"></i>
+         </a>
+         <div class="top-nav-search">
+            <form>
+               <input type="text" class="form-control" placeholder="Search here">
+               <button class="btn" type="submit"><i class="fas fa-search"></i></button>
+            </form>
+         </div>
+         <a class="mobile_btn" id="mobile_btn">
+            <i class="fas fa-bars"></i>
+         </a>
+         <ul class="nav user-menu">
+            <li class="nav-item dropdown has-arrow">
+                {% if user.profile_picture %}
+               <a href="#" class="dropdown-toggle nav-link" data-toggle="dropdown">
+                  <span class="user-img"><img class="rounded-circle" src="{{ user.profile_picture.url }}" alt="{{ user.get_full_name }}" width="31"
+                        alt="Ryan Taylor"></span>
+               </a>
+                {% endif %}
+               <div class="dropdown-menu">
+                  <div class="user-header">
+                     <div class="avatar avatar-sm">
+                        {% if user.profile_picture %}
+                        <img src="{{ user.profile_picture.url }}" alt="{{ user.get_full_name }}" class="avatar-img rounded-circle">
+                        {% else %}
+                        <img src="{% static 'assets/img/profiles/avatar-01.jpg' %}" alt="{{ user.get_full_name }}" class="avatar-img rounded-circle">
+                        {% endif %}
+                     </div>
+                     <div class="user-text">
+                        <h6>{{ user.get_full_name }}</h6>
+                        {% if user.is_superuser %}
+                        <p class="text-muted mb-0">Super Administrator</p>
+                        {% else %}
+                        <p class="text-muted mb-0">Administrator</p>
+                        {% endif %}
+                     </div>
+                  </div>
+                  <a class="dropdown-item" href="{% url 'dashboard:admin_dashboard' %}">My Profile</a>
+                  <a class="dropdown-item" href="{% url 'dashboard:admin_change_password' %}">Change Password</a>
+                  <a class="dropdown-item" href="{% url 'account_logout' %}">Logout</a>
+               </div>
+            </li>
+         </ul>
+      </div>
+      <div class="sidebar" id="sidebar">
+         <div class="sidebar-inner slimscroll">
+            <div id="sidebar-menu" class="sidebar-menu">
+               <ul>
+                  <li class="menu-title">
+                        <span>Main Menu</span>
+                  </li>
+                  <li class="{% if request.resolver_match.url_name == 'admin_dashboard' %}active{% endif %}">
+                        <a href="{% url 'dashboard:admin_dashboard' %}">
+                           <i class="fas fa-tachometer-alt"></i> <span>Dashboard</span>
+                        </a>
+                  </li>
+                  <li class="{% if 'admin_jobs' in request.resolver_match.url_name %}active{% endif %}">
+                        <a href="{% url 'dashboard:admin_jobs' %}">
+                           <i class="fas fa-briefcase"></i> <span>Jobs</span>
+                        </a>
+                  </li>
+                  <li class="{% if 'admin_applications' in request.resolver_match.url_name %}active{% endif %}">
+                        <a href="{% url 'dashboard:admin_applications' %}">
+                           <i class="fas fa-file-alt"></i> <span>Applications</span>
+                        </a>
+                  </li>
+                  <li class="{% if request.resolver_match.url_name == 'admin_reports' %}active{% endif %}">
+                        <a href="{% url 'dashboard:admin_reports' %}">
+                           <i class="fas fa-chart-bar"></i> <span>Reports</span>
+                        </a>
+                  </li>
+                  
+                  <li class="menu-title">
+                        <span>User Management</span>
+                  </li>
+                  <li class="{% if 'admin_users' in request.resolver_match.url_name %}active{% endif %}">
+                        <a href="{% url 'dashboard:admin_users' %}">
+                           <i class="fas fa-users"></i> <span>Users</span>
+                        </a>
+                  </li>
+                  <li class="{% if 'admin_profile' in request.resolver_match.url_name or 'profile' == request.resolver_match.url_name %}active{% endif %}">
+                        <a href="{% url 'dashboard:admin_profile' %}">
+                           <i class="fas fa-user-circle"></i> <span>My Profile</span>
+                        </a>
+                  </li>
+                  
+                  <li class="menu-title">
+                        <span>Site Management</span>
+                  </li>
+                  <li class="{% if request.resolver_match.url_name == 'site_settings' %}active{% endif %}">
+                        <a href="{% url 'dashboard:site_settings' %}">
+                           <i class="fas fa-cogs"></i> <span>Site Settings</span>
+                        </a>
+                  </li>
+                  <li class="{% if 'why_choose_us' in request.resolver_match.url_name %}active{% endif %}">
+                        <a href="{% url 'dashboard:admin_why_choose_us' %}">
+                           <i class="fas fa-award"></i> <span>Why Choose Us</span>
+                        </a>
+                  </li>
+                  <li class="{% if 'faq' in request.resolver_match.url_name and 'admin' in request.resolver_match.url_name %}active{% endif %}">
+                        <a href="{% url 'dashboard:admin_faqs' %}">
+                           <i class="fas fa-circle-question"></i> <span>FAQs</span>
+                        </a>
+                  </li>
+                  <li class="{% if 'blog' in request.resolver_match.url_name %}active{% endif %}">
+                        <a href="{% url 'dashboard:admin_blog_posts' %}">
+                           <i class="fas fa-blog"></i> <span>Blog</span>
+                        </a>
+                  </li>                  
+                  <li class="menu-title">
+                        <span>Account</span>
+                  </li>
+                  <li class="{% if request.resolver_match.url_name == 'admin_change_password' %}active{% endif %}">
+                        <a href="{% url 'dashboard:admin_change_password' %}">
+                           <i class="fas fa-key"></i> <span>Change Password</span>
+                        </a>
+                  </li>
+                  <li>
+                        <a href="{% url 'account_logout' %}" class="text-danger">
+                           <i class="fas fa-sign-out-alt"></i> <span>Logout</span>
+                        </a>
+                  </li>
+               </ul>
+            </div>
+         </div>
+      </div>
+      <div class="page-wrapper">
+        {% block admin_content %}{% endblock admin_content %}
+
+
+        <!-- CKEditor 5 Media -->
+         {{ form.media }}
+        <footer>
+            <p>Copyright © 2020 Dreamguys.</p>
+        </footer>
+
+        <!-- CKEditor 5 Global Include -->
+         {% include 'includes/ckeditor_config.html' %}
+    </div>
+      
+   </div>
+   <script src="{% static 'assets/js/jquery-3.6.0.min.js' %}"></script>
+   <script src="{% static 'assets/js/popper.min.js' %}"></script>
+   <script src="{% static 'assets/plugins/bootstrap/js/bootstrap.min.js' %}"></script>
+   <script src="{% static 'assets/plugins/slimscroll/jquery.slimscroll.min.js' %}"></script>
+   <script src="{% static 'assets/plugins/apexchart/apexcharts.min.js' %}"></script>
+   <script src="{% static 'assets/plugins/apexchart/chart-data.js' %}"></script>
+   <script src="{% static 'assets/js/script.js' %}"></script>
+
+   {% block extra_js %}
+   {% endblock extra_js %}
+</body>
+
+</html>

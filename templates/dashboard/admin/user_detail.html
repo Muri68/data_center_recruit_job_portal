@@ -1,0 +1,150 @@
+{% extends 'dashboard/admin/admin_base.html' %}
+
+{% block admin_content %}
+
+<div class="content container-fluid">
+
+    <div class="page-header">
+        <div class="row align-items-center">
+            <div class="col">
+                <h3 class="page-title">User Details</h3>
+                <p class="text-mute">User Details</p>
+                <ul class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{% url 'dashboard:redirect_dashboard' %}">Dashboard</a></li>
+                    <li class="breadcrumb-item active">User Details</li>
+                </ul>
+            </div>
+            <a href="{% url 'dashboard:admin_users' %}" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left me-2"></i>Back to Users
+            </a>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- User Profile -->
+        <div class="col-lg-4">
+            <div class="card shadow-sm mb-4">
+                <div class="card-body text-center">
+                    {% if user_detail.profile_picture %}
+                    <img src="{{ user_detail.profile_picture.url }}" alt="{{ user_detail.get_full_name }}" 
+                        class="rounded-circle mb-3" width="150" height="150" style="object-fit: cover;">
+                    {% else %}
+                    <div class="bg-secondary text-white rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3" 
+                        style="width: 150px; height: 150px; font-size: 3rem;">
+                        {{ user_detail.get_full_name|first|upper }}
+                    </div>
+                    {% endif %}
+                    <h4>{{ user_detail.get_full_name }}</h4>
+                    <p class="text-muted">{{ user_detail.email }}</p>
+                    <span class="badge bg-primary">{{ user_detail.get_user_type_display }}</span>
+                    
+                    {% if not user_detail.is_active %}
+                    <span class="badge bg-danger">Inactive</span>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="card shadow-sm mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Contact Information</h5>
+                </div>
+                <div class="card-body">
+                    <p><strong>Email:</strong> {{ user_detail.email }}</p>
+                    <p><strong>Phone:</strong> {{ user_detail.phone_number|default:"Not provided" }}</p>
+                    <p><strong>Location:</strong> {{ user_detail.location|default:"Not provided" }}</p>
+                    <p><strong>Joined:</strong> {{ user_detail.date_joined|date:"F d, Y" }}</p>
+                    <p><strong>Last Login:</strong> {{ user_detail.last_login|date:"F d, Y H:i"|default:"Never" }}</p>
+                </div>
+            </div>
+
+            <div class="card shadow-sm mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Professional Links</h5>
+                </div>
+                <div class="card-body">
+                    {% if user_detail.linkedin_profile %}
+                    <a href="{{ user_detail.linkedin_profile }}" target="_blank" class="btn btn-outline-primary btn-sm w-100 mb-2">
+                        <i class="fab fa-linkedin me-2"></i>LinkedIn
+                    </a>
+                    {% endif %}
+                    {% if user_detail.github_profile %}
+                    <a href="{{ user_detail.github_profile }}" target="_blank" class="btn btn-outline-dark btn-sm w-100 mb-2">
+                        <i class="fab fa-github me-2"></i>GitHub
+                    </a>
+                    {% endif %}
+                    {% if user_detail.portfolio_website %}
+                    <a href="{{ user_detail.portfolio_website }}" target="_blank" class="btn btn-outline-success btn-sm w-100">
+                        <i class="fas fa-globe me-2"></i>Portfolio
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- User Applications -->
+        <div class="col-lg-8">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Applications ({{ applications.count }})</h5>
+                </div>
+                <div class="card-body">
+                    {% if applications %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Job</th>
+                                    <th>Company</th>
+                                    <th>Status</th>
+                                    <th>Date</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for app in applications %}
+                                <tr>
+                                    <td>{{ app.job.title }}</td>
+                                    <td>{{ app.job.company_name }}</td>
+                                    <td>
+                                        <span class="badge bg-{{ app.get_status_color }}">
+                                            {{ app.get_status_display }}
+                                        </span>
+                                    </td>
+                                    <td>{{ app.applied_at|date:"M d, Y" }}</td>
+                                    <td>
+                                        <a href="{% url 'dashboard:admin_application_detail' app.id %}" 
+                                        class="btn btn-sm btn-outline-primary">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="text-center py-4">
+                        <i class="fas fa-file-alt fa-3x text-muted mb-3"></i>
+                        <p>No applications yet</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            {% if user_detail.skills %}
+            <div class="card shadow-sm mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Skills</h5>
+                </div>
+                <div class="card-body">
+                    {% for skill in user_detail.skills.split %}
+                    <span class="badge bg-primary me-1 mb-1 p-2">{{ skill.strip }}</span>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+</div>
+{% endblock %}

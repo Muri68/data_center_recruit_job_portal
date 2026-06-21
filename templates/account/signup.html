@@ -1,0 +1,117 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}Sign Up - {{ site_name }}{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6 col-lg-8 col-xl-8">
+            <div class="card shadow-sm">
+                <div class="card-body p-4">
+                    <div class="text-center mb-4">
+                        <h2 class="fw-bold">Create Your Account</h2>
+                        <p class="text-muted">Join {{ site_name }} and find your dream job</p>
+                    </div>
+
+                    <form class="signup" method="POST" action="{% url 'account_signup' %}">
+                        {% csrf_token %}
+                        
+                        {% if form.errors %}
+                        <div class="alert alert-danger">
+                            <strong>Please fix the following errors:</strong>
+                            {{ form.non_field_errors }}
+                        </div>
+                        {% endif %}
+
+                        <div class="row mb-3">
+                            <div class="mb-3 col-md-6">
+                                <label for="id_first_name" class="form-label">First Name *</label>
+                                <input type="text" name="first_name" class="form-control" id="id_first_name" 
+                                    placeholder="Enter your first name" required>
+                                {% if form.first_name.errors %}
+                                <div class="text-danger small">{{ form.first_name.errors }}</div>
+                                {% endif %}
+                            </div>
+
+                            <div class="mb-3 col-md-6">
+                                <label for="id_last_name" class="form-label">Last Name *</label>
+                                <input type="text" name="last_name" class="form-control" id="id_last_name" 
+                                    placeholder="Enter your last name" required>
+                                {% if form.last_name.errors %}
+                                <div class="text-danger small">{{ form.last_name.errors }}</div>
+                                {% endif %}
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="id_email" class="form-label">Email Address *</label>
+                                <input type="email" name="email" class="form-control" id="id_email" 
+                                    placeholder="you@example.com" required>
+                                {% if form.email.errors %}
+                                <div class="text-danger small">{{ form.email.errors }}</div>
+                                {% endif %}
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="id_password1" class="form-label">Password *</label>
+                                <input type="password" name="password1" class="form-control" id="id_password1" 
+                                    placeholder="Create a password" required>
+                                {% if form.password1.errors %}
+                                <div class="text-danger small">{{ form.password1.errors }}</div>
+                                {% endif %}
+                                <div class="form-text small">
+                                    Your password must be at least 8 characters and can't be entirely numeric.
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="id_password2" class="form-label">Confirm Password *</label>
+                                <input type="password" name="password2" class="form-control" id="id_password2" 
+                                    placeholder="Confirm your password" required>
+                                {% if form.password2.errors %}
+                                <div class="text-danger small">{{ form.password2.errors }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <input type="hidden" name="user_type" value="job_seeker">
+
+                        {% if redirect_field_value %}
+                        <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}">
+                        {% endif %}
+
+                        <div class="mb-3">
+                            <div class="form-check">
+                                <input type="checkbox" class="form-check-input" id="terms" required>
+                                <label class="form-check-label small" for="terms">
+                                    I agree to the <a href="#" class="text-primary">Terms of Service</a> and 
+                                    <a href="#" class="text-primary">Privacy Policy</a>
+                                </label>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-dark btn-lg w-100 mb-3">
+                            <i class="fas fa-user-plus me-2"></i>Create Account
+                        </button>
+
+                        <div class="text-center mb-3">
+                            <span class="text-muted">Or sign up with</span>
+                        </div>
+
+                        <a href="{% url 'google_login' %}" class="btn btn-outline-danger w-100 mb-3">
+                            <i class="fab fa-google me-2"></i>Continue with Google
+                        </a>
+                    </form>
+
+                    <div class="text-center">
+                        <p class="mb-0">
+                            Already have an account? 
+                            <a href="{% url 'account_login' %}" class="text-primary">Sign In</a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

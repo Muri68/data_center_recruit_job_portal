@@ -1,0 +1,226 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Job Listings - {{ site_name }}{% endblock %}
+
+{% block content %}
+
+<!-- page-title -->
+<section class="page-title centred pt_110 job-page-title">
+    <div class="auto-container">
+        <div class="content-box">
+            <h1>Job Openings</h1>
+            <ul class="bread-crumb clearfix">
+                <li><a href="index.html">Home</a></li>
+                <li>-</li>
+                <li>Job Openings</li>
+            </ul>
+        </div>
+    </div>
+</section>
+<!-- page-title end -->
+
+
+
+
+<!-- job-section -->
+<section class="job-section pt_110 pb_90">
+    <div class="auto-container">
+        <div class="sec-title pb_60 sec-title-animation animation-style2">
+            <span class="sub-title mb_10 title-animation">Posted jobs</span>
+            <h2 class="title-animation">Find your next career opportunity</h2>
+        </div>
+
+        <!-- Search and Filter Section -->
+        <section class="py-4 bg-light border-bottom">
+            <div class="container">
+                <form method="GET" action="{% url 'jobs:job_list' %}">
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <div class="input-group">
+                                <span class="input-group-text bg-white"><i class="fas fa-search text-muted"></i></span>
+                                <input type="text" class="form-control" name="q" placeholder="Job title or keyword" 
+                                    value="{{ search_query }}">
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="input-group">
+                                <span class="input-group-text bg-white"><i class="fas fa-map-marker-alt text-muted"></i></span>
+                                <input type="text" class="form-control" name="location" placeholder="Location" 
+                                    value="{{ location }}">
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <select class="form-select" name="category">
+                                <option value="">All Categories</option>
+                                {% for category in categories %}
+                                <option value="{{ category.slug }}" {% if category_slug == category.slug %}selected{% endif %}>
+                                    {{ category.name }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="d-grid gap-2 d-flex">
+                                <button type="submit" class="btn btn-primary flex-grow-1">
+                                    <i class="fas fa-search me-1"></i> Search
+                                </button>
+                                <a href="{% url 'jobs:job_list' %}" class="btn btn-outline-secondary">
+                                    <i class="fas fa-redo"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Advanced Filters -->
+                    <div class="row mt-3">
+                        <div class="col-md-3">
+                            <select class="form-select form-select-sm" name="job_type">
+                                <option value="">All Job Types</option>
+                                <option value="full_time" {% if job_type == 'full_time' %}selected{% endif %}>Full Time</option>
+                                <option value="part_time" {% if job_type == 'part_time' %}selected{% endif %}>Part Time</option>
+                                <option value="contract" {% if job_type == 'contract' %}selected{% endif %}>Contract</option>
+                                <option value="internship" {% if job_type == 'internship' %}selected{% endif %}>Internship</option>
+                                <option value="remote" {% if job_type == 'remote' %}selected{% endif %}>Remote</option>
+                                <option value="freelance" {% if job_type == 'freelance' %}selected{% endif %}>Freelance</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <select class="form-select form-select-sm" name="experience_level">
+                                <option value="">All Experience Levels</option>
+                                <option value="entry" {% if experience_level == 'entry' %}selected{% endif %}>Entry Level</option>
+                                <option value="mid" {% if experience_level == 'mid' %}selected{% endif %}>Mid Level</option>
+                                <option value="senior" {% if experience_level == 'senior' %}selected{% endif %}>Senior Level</option>
+                                <option value="lead" {% if experience_level == 'lead' %}selected{% endif %}>Lead/Manager</option>
+                                <option value="executive" {% if experience_level == 'executive' %}selected{% endif %}>Executive</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <select class="form-select form-select-sm" name="sort">
+                                <option value="-posted_at" {% if sort_by == '-posted_at' %}selected{% endif %}>Most Recent</option>
+                                <option value="posted_at" {% if sort_by == 'posted_at' %}selected{% endif %}>Oldest First</option>
+                                <option value="title" {% if sort_by == 'title' %}selected{% endif %}>Title (A-Z)</option>
+                                <option value="-title" {% if sort_by == '-title' %}selected{% endif %}>Title (Z-A)</option>
+                                <option value="company_name" {% if sort_by == 'company_name' %}selected{% endif %}>Company (A-Z)</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="text-muted small mt-1">
+                                <i class="fas fa-briefcase me-1"></i> {{ jobs.paginator.count }} jobs found
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </section>
+
+        <div class="inner-container pt-4">
+            {% if jobs %}
+            {% for job in jobs %}
+            <div class="job-block-one">
+                <div class="upper-box">
+                    <ul class="job-info">
+                        <li><i class="icon-43"></i> <span class="text-dark"> Posted: </span>{{ job.posted_at|timesince }} ago</li>
+                        <li><span class="text-dark"> Job Type: </span> {{ job.get_job_type_display }}</li>
+                        {% if job.is_featured %}
+                        <li><span class="badge bg-warning mb-2">Featured</span></li>
+                        {% endif %}
+                    </ul>                                
+                </div>
+                <div class="inner-box">
+                    <div class="title-box">
+                        <div class="icon-box">
+                            {% if job.category.icon %}
+                            <i class="{{ job.category.icon }}"></i>
+                            {% else %}
+                            <div class="bg-primary text-white d-flex align-items-center justify-content-center me-3" 
+                                    style="width: 60px; height: 60px; border-radius: 8px; font-size: 1.5rem;">
+                                {{ job.title|first|upper }}
+                            </div>
+                            {% endif %}
+                        </div>
+                        <h3>{{ job.title }}</h3>
+                        <span><i class="fas fa-map-marker-alt"></i> {{ job.location }}</span>
+                    </div>
+                    <div class="salary-box">
+                        <h5>Salary</h5>
+                        <span>{{ job.get_salary_range }}</span>
+                    </div>
+                    <div class="experience-box">
+                        <h5>Experience need</h5>
+                        <span>{{ job.get_experience_level_display }}</span>
+                    </div>
+                    <div class="btn-box">
+                        <a href="{% url 'jobs:job_detail' job.slug %}" class="theme-btn btn-one">View Details</a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+            {% else %}
+            <!-- No Jobs Found -->
+            <div class="text-center py-5">
+                <i class="fas fa-search fa-4x text-muted mb-4"></i>
+                <h3>No Jobs Found</h3>
+                <p class="text-muted">Try adjusting your search criteria or browse all available jobs.</p>
+                <a href="{% url 'jobs:job_list' %}" class="btn btn-primary">View All Jobs</a>
+            </div>
+            {% endif %}
+
+            <!-- Pagination -->
+            {% if jobs.has_other_pages %}
+    <div class="pagination-wrapper">
+        <ul class="pagination clearfix">
+            {% if jobs.has_previous %}
+            <li>
+                <a href="?page={{ jobs.previous_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.location %}&location={{ request.GET.location }}{% endif %}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}{% if request.GET.job_type %}&job_type={{ request.GET.job_type }}{% endif %}{% if request.GET.experience_level %}&experience_level={{ request.GET.experience_level }}{% endif %}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}">
+                    <i class="icon-34"></i>
+                </a>
+            </li>
+            {% endif %}
+
+            {% for num in jobs.paginator.page_range %}
+                {% if jobs.number == num %}
+                <li><a class="current">{{ num }}</a></li>
+                {% elif num > jobs.number|add:'-3' and num < jobs.number|add:'3' %}
+                <li>
+                    <a href="?page={{ num }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.location %}&location={{ request.GET.location }}{% endif %}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}{% if request.GET.job_type %}&job_type={{ request.GET.job_type }}{% endif %}{% if request.GET.experience_level %}&experience_level={{ request.GET.experience_level }}{% endif %}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}">
+                        {{ num }}
+                    </a>
+                </li>
+                {% endif %}
+            {% endfor %}
+
+            {% if jobs.has_next %}
+            <li>
+                <a href="?page={{ jobs.next_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.location %}&location={{ request.GET.location }}{% endif %}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}{% if request.GET.job_type %}&job_type={{ request.GET.job_type }}{% endif %}{% if request.GET.experience_level %}&experience_level={{ request.GET.experience_level }}{% endif %}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}">
+                    <i class="icon-35"></i>
+                </a>
+            </li>
+            {% endif %}
+        </ul>
+    </div>
+{% endif %}
+
+            
+        </div>
+    </div>
+</section>
+<!-- job-section end -->
+
+
+<!-- Call to Action -->
+{% if not user.is_authenticated %}
+<section class="py-5 text-white">
+    <div class="container text-center bg-dark text-white py-3 rounded">
+        <h2 class="mb-3" style="color: #fff;">Ready to Apply?</h2>
+        <p class="lead mb-4" style="color: #fff;">Create an account to start applying for jobs and track your applications.</p>
+        <a href="{% url 'account_signup' %}" class="btn btn-light btn-lg me-3">
+            <i class="fas fa-user-plus me-2"></i>Create Account
+        </a>
+        <a href="{% url 'account_login' %}" class="btn btn-outline-light btn-lg">
+            <i class="fas fa-sign-in-alt me-2"></i>Login
+        </a>
+    </div>
+</section>
+{% endif %}
+{% endblock %}

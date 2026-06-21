@@ -1,0 +1,168 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Blog - {{ site_name }}{% endblock %}
+
+{% block content %}
+
+<!-- page-title -->
+<section class="page-title centred pt_110 blog-page-title">
+    <div class="auto-container">
+        <div class="content-box">
+            <h1>Blog</h1>
+            <ul class="bread-crumb clearfix">
+                <li><a href="index.html">Home</a></li>
+                <li>-</li>
+                <li>Blog Posts</li>
+            </ul>
+        </div>
+    </div>
+</section>
+<!-- page-title end -->
+
+
+<!-- sidebar-page-container -->
+<section class="sidebar-page-container p_relative pt_110 pb_120">
+    <div class="auto-container">
+        <div class="row clearfix">
+            <div class="col-lg-4 col-md-12 col-sm-12 sidebar-side">
+                <div class="blog-sidebar mr_40 mb_30">
+                    <div class="search-widget mb_60">
+                        <div class="search-form">
+                            <form action="{% url 'blog:post_list' %}" method="GET">
+                                <div class="form-group">
+                                    <input type="text" class="form-control" name="q" placeholder="Search posts...">
+                                    <button type="submit"><i class="icon-1"></i></button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    <div class="sidebar-widget category-widget mb_50">
+                        <div class="widget-title mb_11">
+                            <h3>Categories</h3>
+                        </div>
+                        <div class="widget-content">
+                            <ul class="category-list clearfix">
+                                <li class="{% if not category_slug %}current{% endif %}">
+                                    <a href="{% url 'blog:post_list' %}" class="text-decoration-none {% if not category_slug %}text-dark{% endif %} d-flex justify-content-between align-items-center">
+                                        All Categories
+                                        <span class="badge {% if not category_slug %}bg-light text-primary{% else %}bg-primary{% endif %} rounded-pill">
+                                            {{ posts.paginator.count }}
+                                        </span>
+                                    </a>
+                                </li>
+                                {% for category in categories %}
+                                <li><a href="?category={{ category.slug }}">{{ category.name }}<span>({{ category.posts.count }})</span></a></li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="sidebar-widget post-widget mb_60">
+                        <div class="widget-title mb_20">
+                            <h3>Recent Posts</h3>
+                        </div>
+                        <div class="post-inner">
+                            {% if posts %}
+                            {% for recent_post in posts|slice:":5" %}
+                            <div class="post">
+                                <figure class="post-thumb">
+                                    {% if recent_post.featured_image %}
+                                        <a href="{% url 'blog:post_detail' recent_post.slug %}">
+                                            <img src="{{ recent_post.featured_image.url }}" alt="">
+                                        </a>
+                                        {% else %}
+                                        <div class="bg-light d-flex align-items-center justify-content-center me-3" 
+                                            style="width: 80px; height: 60px; border-radius: 4px;">
+                                            <i class="fas fa-newspaper text-muted"></i>
+                                        </div>
+                                    {% endif %}
+                                </figure>
+                                <h6><a href="{% url 'blog:post_detail' recent_post.slug %}">{{ recent_post.title }}</a></h6>
+                                <span class="post-date">{{ recent_post.published_at|date:"M d, Y" }}</span>
+                            </div>
+                            {% endfor %}
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="sidebar-widget tags-widget mb_45">
+                        <div class="widget-title mb_20">
+                            <h3>Popular tag</h3>
+                        </div>
+                        <div class="widget-content">
+                            <ul class="tags-list clearfix">
+                                <li><a href="blog-details.html">Software Development</a></li>
+                                <li><a href="blog-details.html">Careers</a></li>
+                                <li><a href="blog-details.html">AI</a></li>
+                                <li><a href="blog-details.html">Development</a></li>
+                                <li><a href="blog-details.html">Technology</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-8 col-md-12 col-sm-12 content-side">
+                <div class="blog-standard-content">
+                    {% if posts %}
+                    {% for post in posts %}
+                    <div class="news-block-two wow fadeInUp animated" data-wow-delay="00ms"
+                        data-wow-duration="1500ms">
+                        <div class="inner-box">
+                            <div class="image-box">
+                                {% if post.featured_image %}
+                                <figure class="image"><a href="{% url 'blog:post_detail' post.slug %}">
+                                    <img src="{{ post.featured_image.url }}" alt="{{ post.title }}"></a></figure>
+                                <figure class="overlay-image"><a href="{% url 'blog:post_detail' post.slug %}"><img
+                                            src="{{ post.featured_image.url }}" alt="{{ post.title }}"></a></figure>
+                                {% else %}
+                                <div class="bg-light d-flex align-items-center justify-content-center" 
+                                    style="height: 200px;">
+                                    <i class="fas fa-newspaper fa-4x text-muted"></i>
+                                </div>
+                                {% endif %}
+                            </div>
+                            <div class="lower-content">
+                                <span class="category">{{ post.category.name }}</span>
+                                <h3><a href="{% url 'blog:post_detail' post.slug %}">{{ post.title }}</a></h3>
+                                <ul class="post-info">
+                                    <li>By <a href="blog-details.html">
+                                        <div class="d-flex align-items-center">
+                                    {% if post.author.profile_picture %}
+                                    <img src="{{ post.author.profile_picture.url }}" alt="{{ post.author.get_full_name }}" 
+                                         class="rounded-circle me-2" width="30" height="30">
+                                    {% else %}
+                                    <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-2" 
+                                         style="width: 30px; height: 30px; font-size: 0.8rem;">
+                                        {{ post.author.get_full_name|first|upper }}
+                                    </div>
+                                    {% endif %}
+                                    <small class="text-muted">
+                                        By <strong>{{ post.author.get_full_name }}</strong>
+                                    </small>
+                                </div>
+                                    </a></li>
+                                    <li><span>{{ post.published_at|date:"M d, Y" }}</span></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                    {% else %}
+                        <p class="text-muted text-center mb-0">No posts yet.</p>
+                    {% endif %}
+                    <div class="pagination-wrapper">
+                        <ul class="pagination clearfix">
+                            <li><a href="blog-2.html"><i class="icon-34"></i></a></li>
+                            <li><a href="blog-2.html" class="current">1</a></li>
+                            <li><a href="blog-2.html">2</a></li>
+                            <li><a href="blog-2.html">3</a></li>
+                            <li><a href="blog-2.html"><i class="icon-35"></i></a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- sidebar-page-container end -->
+
+{% endblock %}

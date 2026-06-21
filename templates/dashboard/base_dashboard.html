@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+{% block dashboard_page_title %}{% endblock %}
+
+
+
+<!-- service-details -->
+<section class="service-details pt_110 pb_120">
+    <div class="auto-container">
+        <div class="row clearfix">
+            <div class="col-lg-4 col-md-12 col-sm-12 sidebar-side">
+                <div class="service-sidebar mr_40">
+                    <div class="category-widget mb_40">
+                        <ul class="category-list clearfix">
+                            <li>
+                                <a href="{% url 'dashboard:job_seeker_dashboard' %}" class="current"> Dashboard
+                                    <i class="icon-42"></i>
+                                </a>
+                            </li>
+                            <li><a href="{% url 'dashboard:my_applications' %}">My Applications <i class="icon-42"></i></a></li>
+                            <li><a href="{% url 'dashboard:profile' %}">My Profile <i class="icon-42"></i></a></li>
+                        </ul>
+
+                        <li class="nav-item">
+                            <a class="nav-link text-danger p-3" href="{% url 'account_logout' %}">
+                                <i class="fas fa-sign-out-alt"></i> Logout
+                            </a>
+                        </li>
+
+                        <a href="{% url 'account_change_password' %}">Change Password</a>
+                    </div>
+
+                    {% block dashboard_sidebar_content_additional %}{% endblock %}
+                </div>
+            </div>
+            <div class="col-lg-8 col-md-12 col-sm-12 content-side">
+                {% block dashboard_content %}{% endblock %}
+            </div>
+        </div>
+    </div>
+</section>
+<!-- service-details end -->
+
+{% endblock %}

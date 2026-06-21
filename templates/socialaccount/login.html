@@ -1,0 +1,103 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Sign in with Google - {{ site_name }}{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-5 col-lg-6 col-xl-6">
+
+            <div class="card shadow-sm border-0">
+                <div class="card-body p-4 text-center">
+                    
+                    <!-- Google Icon -->
+                    <div class="mb-4">
+                        <div class="bg-light rounded-circle d-inline-flex align-items-center justify-content-center" 
+                             style="width: 80px; height: 80px;">
+                            <i class="fab fa-google fa-3x text-danger"></i>
+                        </div>
+                    </div>
+
+                    <h4 class="mb-2">Google Sign In</h4>
+
+                    <p class="text-muted mb-4">
+                        Sign in to <strong>{{ site_name }}</strong> using your Google account 
+                        for a faster, more secure experience.
+                    </p>
+                    
+                    <p class="text-muted mb-4">
+                        {% if process == "connect" %}
+                            Connect your Google account to your profile
+                        {% else %}
+                            You'll be redirected to Google to complete sign in
+                        {% endif %}
+                    </p>
+
+                    {% if request.GET.email %}
+                    <div class="alert alert-light border mb-4">
+                        <div class="d-flex align-items-center justify-content-center">
+                            <i class="fab fa-google text-danger me-2"></i>
+                            <span>{{ request.GET.email }}</span>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <form method="POST">
+                        {% csrf_token %}
+                        
+                        <button type="submit" class="btn btn-light btn-lg w-100 mb-3 border" id="googleBtn">
+                            <img src="https://www.google.com/favicon.ico" 
+                                 alt="Google" 
+                                 style="width: 20px;" 
+                                 class="me-2">
+                            {% if process == "connect" %}
+                                Connect Google Account
+                            {% else %}
+                                Continue with Google
+                            {% endif %}
+                        </button>
+                    </form>
+
+                    <div class="d-flex align-items-center justify-content-center mb-3">
+                        <hr class="flex-grow-1">
+                        <span class="mx-2 text-muted small">or</span>
+                        <hr class="flex-grow-1">
+                    </div>
+
+                    <a href="{% url 'account_login' %}" class="btn btn-outline-dark text-dark w-100">
+                        <i class="fas fa-envelope me-2"></i>Sign in with Email
+                    </a>
+                </div>
+            </div>
+
+            <div class="text-center mt-3">
+                <small class="text-muted">
+                    <i class="fas fa-lock me-1"></i>
+                    Secured by Google OAuth 2.0
+                </small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.btn-outline-dark {
+    border: 2px solid #e0e0e0;
+    background-color: #ffffff;
+    padding: 12px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.btn-outline-dark:hover {
+    background-color: #f8f9fa;
+    border-color: #bdbdbd;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.card {
+    border-radius: 16px;
+}
+</style>
+{% endblock %}

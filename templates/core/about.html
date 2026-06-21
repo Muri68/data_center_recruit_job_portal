@@ -1,0 +1,291 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}About Us - {{ site_name }}{% endblock %}
+
+{% block content %}
+
+<!-- page-title -->
+<section class="page-title centred pt_110 about-page-title">
+    <div class="auto-container">
+        <div class="content-box">
+            <h1>About Us</h1>
+            <ul class="bread-crumb clearfix">
+                <li><a href="{% url 'core:home' %}">Home</a></li>
+                <li>-</li>
+                <li>About Us</li>
+            </ul>
+        </div>
+    </div>
+</section>
+<!-- page-title end -->
+
+
+<!-- about-style-two -->
+<section class="about-style-two">
+    <div class="auto-container">
+        <div class="row align-items-center">
+
+            <div class="col-lg-6 col-md-12 col-sm-12 content-column">
+                <div class="content_block_one">
+                    <div class="content-box mr_80">
+                        {% if site_settings %}
+                        <div class="sec-title pb_20 sec-title-animation animation-style2">
+                            <span class="sub-title mb_10 title-animation">About Us</span>
+                            <h2 class="title-animation" id="animated-title">
+                                {{ site_settings.about_title }}
+                            </h2>
+                        </div>
+
+                        <div class="text-box">
+                            <p>{{ site_settings.about_description|safe }}</p>
+                        </div>
+                        {% endif %}
+
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-6 col-md-12 col-sm-12 video-column">
+                <div class="video_block_two">
+                    <div class="video-box t_120 z_1 p_relative ml_40 mr_60 centred">
+                        <div class="video-inner"
+                            style="background-image: url({% static 'images/resource/video-1.jpg' %}); background-size: cover; background-position: center; min-height: 500px;">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+<!-- about-style-two end -->
+
+
+<!-- chooseus-section -->
+<section class="chooseus-section alternat-2 pt_120 pb_90">
+    <div class="auto-container">
+        {% if site_settings %}
+        <div class="sec-title pb_60 sec-title-animation animation-style2">
+            <span class="sub-title mb_10 title-animation">{{ site_settings.why_choose_us_title }}</span>
+            <h2 class="title-animation">{{ site_settings.why_choose_us_subtitle }}</h2>
+            <p>{{ site_settings.why_choose_us_description }}</p>
+        </div>
+        {% endif %}
+
+        <div class="inner-container">
+            <div class="row clearfix">
+                {% for feature in why_choose_us_features %}
+                <!-- Block 1 -->
+                <div class="col-lg-4 col-md-6 col-sm-12 chooseus-block">
+                    <div class="chooseus-block-one">
+                        <div class="inner-box">
+
+                            <div class="icon-box"><i class="{{ feature.icon }}"></i></div>
+
+                            <h3>{{ feature.title }}</h3>
+                            <p>
+                                {{ feature.description }}
+                            </p>
+
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="col-12 text-center py-5">
+                    <i class="fas fa-star fa-3x text-muted mb-3"></i>
+                    <p class="text-muted">Why choose us features coming soon.</p>
+                </div>
+                {% endfor %}
+
+            </div>
+        </div>
+
+    </div>
+</section>
+<!-- chooseus-section end -->
+
+
+<!-- team-section -->
+<section class="team-section z_1 centred pt_0 pb_0">
+    <div class="auto-container">
+        <div class="sec-title pb_60 sec-title-animation animation-style2">
+            <span class="sub-title mb_10 title-animation">Our Team</span>
+            <h2 class="title-animation">Meet The Team</h2>
+        </div>
+        <div class="row clearfix">
+            <div class="col-lg-3 col-md-6 col-sm-12 team-block">
+                <div class="team-block-one wow fadeInUp animated" data-wow-delay="00ms"
+                    data-wow-duration="1500ms">
+                    <div class="inner-box">
+                        <div class="image-box">
+                            <figure class="image"><img src="{% static 'images/team/team-1.jpg' %}" alt=""></figure>
+                            <figure class="overlay-image"><img src="{% static 'images/team/team-1.jpg' %}" alt="">
+                            </figure>
+                        </div>
+                        <div class="lower-content">
+                            <h3><a href="index.html">Tom Oliver</a></h3>
+                            <span class="designation">Founder</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6 col-sm-12 team-block">
+                <div class="team-block-one wow fadeInUp animated" data-wow-delay="200ms"
+                    data-wow-duration="1500ms">
+                    <div class="inner-box">
+                        <div class="image-box">
+                            <figure class="image"><img src="{% static 'images/team/team-2.jpg' %}" alt=""></figure>
+                            <figure class="overlay-image"><img src="{% static 'images/team/team-2.jpg' %}" alt="">
+                            </figure>
+                        </div>
+                        <div class="lower-content">
+                            <h3><a href="index.html">Loenard Barnes</a></h3>
+                            <span class="designation">Lead Engineer</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6 col-sm-12 team-block">
+                <div class="team-block-one wow fadeInUp animated" data-wow-delay="400ms"
+                    data-wow-duration="1500ms">
+                    <div class="inner-box">
+                        <div class="image-box">
+                            <figure class="image"><img src="{% static 'images/team/team-3.jpg' %}" alt=""></figure>
+                            <figure class="overlay-image"><img src="{% static 'images/team/team-3.jpg' %}" alt="">
+                            </figure>
+                        </div>
+                        <div class="lower-content">
+                            <h3><a href="index.html">Gilbert Sherman</a></h3>
+                            <span class="designation">Sale Manager</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6 col-sm-12 team-block">
+                <div class="team-block-one wow fadeInUp animated" data-wow-delay="600ms"
+                    data-wow-duration="1500ms">
+                    <div class="inner-box">
+                        <div class="image-box">
+                            <figure class="image"><img src="{% static 'images/team/team-4.jpg' %}" alt=""></figure>
+                            <figure class="overlay-image"><img src="{% static 'images/team/team-4.jpg' %}" alt="">
+                            </figure>
+                        </div>
+                        <div class="lower-content">
+                            <h3><a href="index.html">Franklin Bailey</a></h3>
+                            <span class="designation">Art Director</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- team-section end -->
+
+
+<!-- testimonial-style-two -->
+<section class="testimonial-style-two pt_70 pb_120">
+    <div class="pattern-layer"></div>
+    <div class="auto-container">
+        <div class="sec-title centred pb_60 sec-title-animation animation-style2">
+            <span class="sub-title mb_10 title-animation">Testimonials</span>
+            <h2 class="title-animation">Love From Users</h2>
+        </div>
+        <div class="two-item-carousel owl-carousel owl-theme owl-nav-none">
+            <div class="testimonial-block-two">
+                <div class="inner-box">
+                    <div class="icon-box"><img src="{% static 'images/icons/icon-11.png' %}" alt=""></div>
+                    <div class="author-box">
+                        <figure class="thumb-box"><img src="{% static 'images/resource/testimonial-1.png' %}" alt="">
+                        </figure>
+                        <h4>Evan Clement</h4>
+                        <span class="designation">HR Assistant, NFL</span>
+                    </div>
+                    <p>Company and was impressed by the personalized approach of their recruitment team. They
+                        kept me informed at every stage and ensured that I had all the information I needed to
+                        succeed.</p>
+                </div>
+            </div>
+            <div class="testimonial-block-two">
+                <div class="inner-box">
+                    <div class="icon-box"><img src="{% static 'images/icons/icon-11.png' %}" alt=""></div>
+                    <div class="author-box">
+                        <figure class="thumb-box"><img src="{% static 'images/resource/testimonial-3.png' %}" alt="">
+                        </figure>
+                        <h4>Maharan Depaak</h4>
+                        <span class="designation">CEO, Amaban</span>
+                    </div>
+                    <p>Recently I went through their recruitment process with Jobaway Company, and I was
+                        impressed by how the smooth and efficient these were.</p>
+                </div>
+            </div>
+            <div class="testimonial-block-two">
+                <div class="inner-box">
+                    <div class="icon-box"><img src="{% static 'images/icons/icon-11.png' %}" alt=""></div>
+                    <div class="author-box">
+                        <figure class="thumb-box"><img src="{% static 'images/resource/testimonial-1.png' %}" alt="">
+                        </figure>
+                        <h4>Evan Clement</h4>
+                        <span class="designation">HR Assistant, NFL</span>
+                    </div>
+                    <p>Company and was impressed by the personalized approach of their recruitment team. They
+                        kept me informed at every stage and ensured that I had all the information I needed to
+                        succeed.</p>
+                </div>
+            </div>
+            <div class="testimonial-block-two">
+                <div class="inner-box">
+                    <div class="icon-box"><img src="{% static 'images/icons/icon-11.png' %}" alt=""></div>
+                    <div class="author-box">
+                        <figure class="thumb-box"><img src="{% static 'images/resource/testimonial-3.png' %}" alt="">
+                        </figure>
+                        <h4>Maharan Depaak</h4>
+                        <span class="designation">CEO, Amaban</span>
+                    </div>
+                    <p>Recently I went through their recruitment process with Jobaway Company, and I was
+                        impressed by how the smooth and efficient these were.</p>
+                </div>
+            </div>
+            <div class="testimonial-block-two">
+                <div class="inner-box">
+                    <div class="icon-box"><img src="{% static 'images/icons/icon-11.png' %}" alt=""></div>
+                    <div class="author-box">
+                        <figure class="thumb-box"><img src="{% static 'images/resource/testimonial-1.png' %}" alt="">
+                        </figure>
+                        <h4>Evan Clement</h4>
+                        <span class="designation">HR Assistant, NFL</span>
+                    </div>
+                    <p>Company and was impressed by the personalized approach of their recruitment team. They
+                        kept me informed at every stage and ensured that I had all the information I needed to
+                        succeed.</p>
+                </div>
+            </div>
+            <div class="testimonial-block-two">
+                <div class="inner-box">
+                    <div class="icon-box"><img src="{% static 'images/icons/icon-11.png' %}" alt=""></div>
+                    <div class="author-box">
+                        <figure class="thumb-box"><img src="{% static 'images/resource/testimonial-3.png' %}" alt="">
+                        </figure>
+                        <h4>Maharan Depaak</h4>
+                        <span class="designation">CEO, Amaban</span>
+                    </div>
+                    <p>Recently I went through their recruitment process with Jobaway Company, and I was
+                        impressed by how the smooth and efficient these were.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- testimonial-style-two end -->
+
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const title = document.getElementById('animated-title');
+        const words = title.textContent.trim().split(' ');
+        const lastWord = words.pop();
+        title.innerHTML = words.join(' ') + ' <span>' + lastWord + '</span>';
+    });
+</script>
+{% endblock %}

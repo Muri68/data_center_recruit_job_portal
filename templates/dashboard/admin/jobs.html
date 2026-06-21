@@ -1,0 +1,119 @@
+{% extends 'dashboard/admin/admin_base.html' %}
+
+{% block admin_content %}
+
+<div class="content container-fluid">
+
+    <div class="page-header">
+        <div class="row align-items-center">
+            <div class="col">
+                <h3 class="page-title">Jobs</h3>
+                <p class="text-mute">Manage Job Listening</p>
+                <ul class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{% url 'dashboard:redirect_dashboard' %}">Dashboard</a></li>
+                    <li class="breadcrumb-item active">Jobs</li>
+                </ul>
+            </div>
+            <div class="col-auto text-right float-right ml-auto">
+                <a href="{% url 'dashboard:create_job' %}" class="btn btn-primary"><i class="fas fa-plus"></i> Post New Job</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <form method="GET" class="row g-3">
+                <div class="col-md-3">
+                    <select name="status" class="form-control">
+                        <option value="">All Statuses</option>
+                        <option value="draft" {% if status_filter == 'draft' %}selected{% endif %}>Draft</option>
+                        <option value="published" {% if status_filter == 'published' %}selected{% endif %}>Published</option>
+                        <option value="closed" {% if status_filter == 'closed' %}selected{% endif %}>Closed</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <select name="category" class="form-control">
+                        <option value="">All Categories</option>
+                        {% for category in categories %}
+                        <option value="{{ category.id }}" {% if category_filter == category.id|stringformat:"s" %}selected{% endif %}>
+                            {{ category.name }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-primary w-100">Filter</button>
+                </div>
+                <div class="col-md-2">
+                    <a href="{% url 'dashboard:admin_jobs' %}" class="btn btn-outline-secondary w-100">Reset</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="card card-table">
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover table-center mb-0">
+                            <thead>
+                                <tr>
+                                    <th>S/N</th>
+                                    <th>JOB TITLE</th>
+                                    <th>CATEGORY</th>
+                                    <th>STATUS</th>
+                                    <th>APPLICATIONS</th>
+                                    <th>POSTED</th>
+                                    <th class="text-center">ACTION</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for job in jobs %}
+                                <tr>
+                                    <td>{{ forloop.counter}}</td>
+                                    <td>
+                                        <strong>{{ job.title }}</strong><br>
+                                        <small class="text-muted"> <i class="fas fa-map-marker-alt"></i> {{ job.location }}</small>
+                                    </td>
+                                    <td>{{ job.category.name }}</td>
+                                    <td>
+                                        {% if job.status == 'published' %}
+                                        <span class="badge bg-success">Published</span>
+                                        {% elif job.status == 'draft' %}
+                                        <span class="badge bg-warning">Draft</span>
+                                        {% else %}
+                                        <span class="badge bg-secondary">Closed</span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="text-center">
+                                        <span class="badge bg-info p-2">{{ job.applications_count }}</span>
+                                    </td>
+                                    <td>{{ job.posted_at|date:"M d, Y" }}</td>
+                                    <td class="text-right">
+                                        <div class="actions">
+                                            <a href="{% url 'jobs:job_detail' job.slug %}" class="btn btn-sm text-white bg-success mr-2">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                            <a href="{% url 'dashboard:edit_job' job.id %}"
+                                                class="btn btn-sm bg-success-light mr-2">
+                                                <i class="fas fa-pen"></i>
+                                            </a>
+                                            <a href="{% url 'dashboard:delete_job' job.id %}" class="btn btn-sm bg-danger-light">
+                                                <i class="fas fa-trash"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

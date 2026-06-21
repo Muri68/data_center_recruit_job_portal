@@ -1,0 +1,14 @@
+Hello {{ user.first_name|default:user.email }},
+
+Thank you for signing up with {{ site_name }}!
+
+Please confirm your email address by clicking the link below:
+
+{{ activate_url }}
+
+This link will expire in {{ expiration_days }} days.
+
+If you did not create an account with us, please ignore this email.
+
+Best regards,
+The {{ site_name }} Team

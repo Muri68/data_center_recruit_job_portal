@@ -1,0 +1,198 @@
+{% extends 'dashboard/base_dashboard.html' %}
+
+{% block dashboard_page_title %}
+<!-- page-title -->
+<section class="page-title centred pt_110">
+    <div class="auto-container">
+        <div class="content-box">
+            <h1>Update Profile</h1>
+            <ul class="bread-crumb clearfix">
+                <li><a href="{% url "core:home" %}">Home</a></li>
+                <li>-</li>
+                <li>Update Profile</li>
+            </ul>
+        </div>
+    </div>
+</section>
+<!-- page-title end -->
+{% endblock %}
+
+
+{% block dashboard_sidebar_content_additional %}
+
+<div class="col-lg-12">
+    <!-- Profile Completion -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">Profile Completion</h5>
+        </div>
+        <div class="card-body">
+            {% with completion=user.get_profile_completion %}
+            <div class="progress mb-3" style="height: 20px;">
+                <div class="progress-bar bg-success" role="progressbar" 
+                    style="width: {{ completion }}%" 
+                    aria-valuenow="{{ completion }}" 
+                    aria-valuemin="0" 
+                    aria-valuemax="100">
+                    {{ completion }}%
+                </div>
+            </div>
+            {% if completion < 100 %}
+            <a href="{% url 'dashboard:update_profile' %}" class="btn btn-outline-success btn-sm w-100">
+                <i class="fas fa-edit me-2"></i>Complete Your Profile
+            </a>
+            {% endif %}
+            {% endwith %}
+        </div>
+    </div>
+
+    <!-- Quick Links -->
+    <div class="card shadow-sm">
+        <div class="card-header">
+            <h5 class="mb-0">Quick Links</h5>
+        </div>
+        <div class="card-body">
+            <div class="d-grid gap-2">
+                <a href="{% url 'jobs:job_list' %}" class="btn btn-outline-primary btn-sm">
+                    <i class="fas fa-search me-2"></i>Browse Jobs
+                </a>
+                <a href="{% url 'dashboard:update_profile' %}" class="btn btn-outline-primary btn-sm">
+                    <i class="fas fa-edit me-2"></i>Update Profile
+                </a>
+                <a href="{% url 'dashboard:my_applications' %}" class="btn btn-outline-primary btn-sm">
+                    <i class="fas fa-list me-2"></i>My Applications
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+
+
+{% block dashboard_content %}
+<div class="row">
+    <div class="col-lg-12 mx-auto">
+        <div class="card shadow-sm">
+            <div class="card-header">
+                <h5 class="mb-0">Update Profile</h5>
+            </div>
+            <div class="card-body p-4">
+                <form method="POST" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    
+                    <h5 class="mb-3">Personal Information</h5>
+                    <div class="row mb-4">
+                        <div class="col-md-6 mb-3">
+                            <label for="first_name" class="form-label">First Name *</label>
+                            <input type="text" class="form-control" id="first_name" name="first_name" 
+                                   value="{{ user.first_name }}" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="last_name" class="form-label">Last Name *</label>
+                            <input type="text" class="form-control" id="last_name" name="last_name" 
+                                   value="{{ user.last_name }}" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="phone_number" class="form-label">Phone Number</label>
+                            <input type="tel" class="form-control" id="phone_number" name="phone_number" 
+                                   value="{{ user.phone_number|default:'' }}">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="location" class="form-label">Location</label>
+                            <input type="text" class="form-control" id="location" name="location" 
+                                   value="{{ user.location|default:'' }}" placeholder="City, Country">
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="bio" class="form-label">Bio</label>
+                        <textarea class="form-control" id="bio" name="bio" rows="4" 
+                                  placeholder="Tell us about yourself...">{{ user.bio|default:'' }}</textarea>
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="skills" class="form-label">Skills</label>
+                        <input type="text" class="form-control" id="skills" name="skills" 
+                               value="{{ user.skills|default:'' }}" 
+                               placeholder="e.g., Python, JavaScript, Project Management">
+                        <div class="form-text">Separate skills with commas</div>
+                    </div>
+
+                    <h5 class="mb-3">Professional Links</h5>
+                    <div class="row mb-4">
+                        <div class="col-md-4 mb-3">
+                            <label for="linkedin_profile" class="form-label">LinkedIn</label>
+                            <input type="url" class="form-control" id="linkedin_profile" name="linkedin_profile" 
+                                   value="{{ user.linkedin_profile|default:'' }}" placeholder="https://linkedin.com/in/...">
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label for="github_profile" class="form-label">GitHub</label>
+                            <input type="url" class="form-control" id="github_profile" name="github_profile" 
+                                   value="{{ user.github_profile|default:'' }}" placeholder="https://github.com/...">
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label for="portfolio_website" class="form-label">Portfolio Website</label>
+                            <input type="url" class="form-control" id="portfolio_website" name="portfolio_website" 
+                                   value="{{ user.portfolio_website|default:'' }}" placeholder="https://...">
+                        </div>
+                    </div>
+
+                    <h5 class="mb-3">Uploads</h5>
+                    <div class="row mb-4">
+                        <div class="col-md-6 mb-3">
+                            <label for="profile_picture" class="form-label">Profile Picture</label>
+                            {% if user.profile_picture %}
+                            <div class="mb-2">
+                                <img src="{{ user.profile_picture.url }}" alt="Current" 
+                                     class="rounded" width="100" height="100" style="object-fit: cover;">
+                            </div>
+                            {% endif %}
+                            <input type="file" class="form-control" id="profile_picture" name="profile_picture" 
+                                   accept="image/*">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="resume" class="form-label">Resume/CV</label>
+                            {% if user.resume %}
+                            <div class="mb-2">
+                                <span class="badge bg-info">Current: {{ user.resume.name }}</span>
+                            </div>
+                            {% endif %}
+                            <input type="file" class="form-control" id="resume" name="resume" 
+                                   accept=".pdf,.doc,.docx">
+                        </div>
+                    </div>
+
+                    <h5 class="mb-3">Preferences</h5>
+                    <div class="mb-4">
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="checkbox" id="email_notifications" 
+                                   name="email_notifications" {% if user.email_notifications %}checked{% endif %}>
+                            <label class="form-check-label" for="email_notifications">
+                                Receive email notifications about application updates
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="job_alerts" 
+                                   name="job_alerts" {% if user.job_alerts %}checked{% endif %}>
+                            <label class="form-check-label" for="job_alerts">
+                                Receive job alerts matching my skills
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-between">
+                        <a href="{% url 'dashboard:profile' %}" class="btn btn-outline-secondary">
+                            Cancel
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save me-2"></i>Save Changes
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,222 @@
+{% load static %}
+
+<!-- CKEditor 5 CDN -->
+<script src="https://cdn.ckeditor.com/ckeditor5/41.0.0/classic/ckeditor.js"></script>
+
+<script>
+/**
+ * Global CKEditor 5 Initialization
+ * Automatically initializes all textareas with class 'ckeditor'
+ */
+    document.addEventListener('DOMContentLoaded', function() {
+        
+        // Get CKEditor config from Django settings
+        const editorConfig = {
+            toolbar: {
+                items: [
+                    'heading', '|',
+                    'fontSize', 'fontFamily', '|',
+                    'bold', 'italic', 'underline', 'strikethrough', 'subscript', 'superscript', '|',
+                    'fontColor', 'fontBackgroundColor', '|',
+                    'removeFormat', '|',
+                    'alignment', '|',
+                    'bulletedList', 'numberedList', 'todoList', '|',
+                    'outdent', 'indent', '|',
+                    'link', 'blockQuote', 'codeBlock', '|',
+                    'imageUpload', 'mediaEmbed', 'insertTable', 'horizontalLine', '|',
+                    'specialCharacters', '|',
+                    'undo', 'redo', '|',
+                    'sourceEditing'
+                ],
+                shouldNotGroupWhenFull: true
+            },
+            fontSize: {
+                options: [8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 28, 32, 36, 48],
+                supportAllValues: false
+            },
+            fontFamily: {
+                options: [
+                    'default',
+                    'Arial, Helvetica, sans-serif',
+                    'Courier New, Courier, monospace',
+                    'Georgia, serif',
+                    'Tahoma, Geneva, sans-serif',
+                    'Times New Roman, Times, serif',
+                    'Verdana, Geneva, sans-serif'
+                ],
+                supportAllValues: true
+            },
+            heading: {
+                options: [
+                    { model: 'paragraph', title: 'Normal', class: 'ck-heading_paragraph' },
+                    { model: 'heading1', view: 'h1', title: 'Heading 1', class: 'ck-heading_heading1' },
+                    { model: 'heading2', view: 'h2', title: 'Heading 2', class: 'ck-heading_heading2' },
+                    { model: 'heading3', view: 'h3', title: 'Heading 3', class: 'ck-heading_heading3' },
+                    { model: 'heading4', view: 'h4', title: 'Heading 4', class: 'ck-heading_heading4' }
+                ]
+            },
+            image: {
+                toolbar: [
+                    'imageTextAlternative',
+                    'toggleImageCaption',
+                    'imageStyle:inline',
+                    'imageStyle:block',
+                    'imageStyle:side',
+                    'linkImage'
+                ]
+            },
+            table: {
+                contentToolbar: [
+                    'tableColumn',
+                    'tableRow',
+                    'mergeTableCells',
+                    'tableCellProperties',
+                    'tableProperties'
+                ]
+            },
+            link: {
+                addTargetToExternalLinks: true,
+                defaultProtocol: 'https://'
+            },
+            alignment: {
+                options: ['left', 'center', 'right', 'justify']
+            },
+            height: 400,
+            language: 'en',
+            placeholder: 'Type your content here...'
+        };
+        
+        // Initialize CKEditor for all elements with class 'ckeditor'
+        const textareas = document.querySelectorAll('.ckeditor');
+        
+        if (textareas.length === 0) {
+            console.log('ℹ️ No CKEditor elements found on this page');
+            return;
+        }
+        
+        console.log(`🔧 Initializing CKEditor for ${textareas.length} element(s)...`);
+        
+        textareas.forEach(function(textarea) {
+            // Check for custom configuration
+            let config = { ...editorConfig };
+            
+            // Custom height from data attribute
+            if (textarea.dataset.height) {
+                config.height = parseInt(textarea.dataset.height);
+            }
+            
+            // Custom toolbar from data attribute (minimal/extended)
+            if (textarea.dataset.toolbar === 'minimal') {
+                config.toolbar.items = [
+                    'heading', '|',
+                    'bold', 'italic', 'underline', '|',
+                    'link', 'bulletedList', 'numberedList', '|',
+                    'undo', 'redo'
+                ];
+                config.height = 200;
+            } else if (textarea.dataset.toolbar === 'basic') {
+                config.toolbar.items = [
+                    'heading', '|',
+                    'bold', 'italic', 'underline', 'strikethrough', '|',
+                    'link', 'blockQuote', '|',
+                    'bulletedList', 'numberedList', '|',
+                    'imageUpload', '|',
+                    'undo', 'redo'
+                ];
+            }
+            
+            ClassicEditor
+                .create(textarea, config)
+                .then(editor => {
+                    console.log('✅ CKEditor initialized:', textarea.id || textarea.name || 'unnamed');
+                    
+                    // Store editor instance
+                    textarea.ckeditorInstance = editor;
+                    
+                    // Handle change events
+                    editor.model.document.on('change:data', () => {
+                        textarea.value = editor.getData();
+                    });
+                })
+                .catch(error => {
+                    console.error('❌ CKEditor error:', error);
+                });
+        });
+        
+        // Auto-sync all editors before any form submission
+        document.addEventListener('submit', function(e) {
+            const form = e.target;
+            const formEditors = form.querySelectorAll('.ckeditor');
+            
+            formEditors.forEach(function(textarea) {
+                if (textarea.ckeditorInstance) {
+                    textarea.value = textarea.ckeditorInstance.getData();
+                }
+            });
+        }, true); // Use capture phase to run before other handlers
+        
+    });
+    </script>
+
+<style>
+    /* Global CKEditor Styles */
+    .ck-editor__editable {
+        min-height: 200px;
+        max-height: 600px;
+    }
+
+    .ck-content {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        font-size: 14px;
+        line-height: 1.6;
+        color: #333;
+    }
+
+    .ck.ck-editor__main>.ck-editor__editable {
+        background: #fff;
+        border-radius: 0 0 8px 8px;
+        border: 1px solid #dee2e6;
+        border-top: none;
+    }
+
+    .ck.ck-toolbar {
+        border-radius: 8px 8px 0 0 !important;
+        background: #f8f9fa !important;
+        border: 1px solid #dee2e6 !important;
+        border-bottom: none !important;
+    }
+
+    .ck.ck-toolbar .ck-button {
+        color: #495057;
+    }
+
+    .ck.ck-toolbar .ck-button:hover {
+        background: #e9ecef;
+    }
+
+    .ck.ck-toolbar .ck-button.ck-on {
+        background: #0d6efd;
+        color: white;
+    }
+
+    .ck.ck-dropdown__panel {
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+
+    .ck.ck-editor__editable.ck-focused:not(.ck-editor__nested-editable) {
+        border-color: #0d6efd;
+        box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.15);
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .ck-editor__editable {
+            min-height: 150px;
+            max-height: 400px;
+        }
+        .ck.ck-toolbar {
+            flex-wrap: wrap;
+        }
+    }
+</style>

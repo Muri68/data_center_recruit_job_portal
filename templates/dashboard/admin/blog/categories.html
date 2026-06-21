@@ -1,0 +1,104 @@
+{% extends 'dashboard/admin/admin_base.html' %}
+
+{% block title %}Blog Categories - {{ site_name }}{% endblock %}
+
+{% block admin_content %}
+
+<div class="content container-fluid">
+
+    <div class="page-header">
+        <div class="row align-items-center">
+            <div class="col">
+                <h3 class="page-title">Blog Categories</h3>
+                <p class="text-mute">Manage Blog Categories</p>
+                <ul class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{% url 'dashboard:redirect_dashboard' %}">Dashboard</a></li>
+                    <li class="breadcrumb-item active">Blog Categories</li>
+                </ul>
+            </div>
+            <div class="col-auto text-right float-right ml-auto">
+                <a href="{% url 'dashboard:admin_blog_posts' %}" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left me-1"></i> Back to Posts
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-5">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-plus-circle me-2"></i> Add Category</h5>
+                </div>
+                <div class="card-body">
+                    <form method="POST">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="name" class="form-label">Category Name *</label>
+                            <input type="text" class="form-control" id="name" name="name" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="description" class="form-label">Description</label>
+                            <textarea class="form-control" id="description" name="description" rows="3"></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="fas fa-save me-1"></i> Create Category
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-7">
+            <div class="card shadow-sm">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="fas fa-folder me-2"></i> Categories</h5>
+                    <span class="badge bg-primary text-white p-2">{{ categories.count }} Total</span>
+                </div>
+                <div class="card-body">
+                    {% if categories %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr><th>Name</th><th>Posts</th><th>Slug</th><th>Actions</th></tr>
+                            </thead>
+                            <tbody>
+                                {% for category in categories %}
+                                <tr>
+                                    <td><strong>{{ category.name }}</strong></td>
+                                    <td><span class="badge bg-info text-white p-2">{{ category.post_count }}</span></td>
+                                    <td><code>{{ category.slug }}</code></td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-danger" 
+                                                onclick="deleteCategory({{ category.id }}, '{{ category.name }}')">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <p class="text-center text-muted py-3">No categories yet.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <form id="deleteForm" method="POST" style="display: none;">
+        {% csrf_token %}
+    </form>
+
+</div>
+<script>
+function deleteCategory(id, name) {
+    if (confirm('Delete category "' + name + '"? This will not delete the posts in this category.')) {
+        const form = document.getElementById('deleteForm');
+        form.action = '/dashboard/admin/blog/categories/' + id + '/delete/';
+        form.submit();
+    }
+}
+</script>
+{% endblock %}

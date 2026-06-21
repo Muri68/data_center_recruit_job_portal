@@ -1,0 +1,270 @@
+{% extends 'dashboard/admin/admin_base.html' %}
+{% load static %}
+
+{% block title %}Post New Job - {{ site_name }}{% endblock %}
+
+{% block admin_content %}
+
+<div class="content container-fluid">
+    <div class="page-header">
+        <div class="row align-items-center">
+            <div class="col">
+                <h3 class="page-title">Post New Job</h3>
+                <p class="text-mute">Create a new job listing</p>
+                <ul class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{% url 'dashboard:redirect_dashboard' %}">Dashboard</a></li>
+                    <li class="breadcrumb-item active">Post New Job</li>
+                </ul>
+            </div>
+            <div class="col-auto text-right float-right ml-auto">
+                <a href="{% url 'dashboard:admin_jobs' %}" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left me-2"></i>Back to Jobs
+                </a>
+            </div>
+        </div>
+    </div>
+
+<form method="POST" enctype="multipart/form-data" id="createJobForm">
+    {% csrf_token %}
+    
+    <!-- Basic Information -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">
+                <i class="fas fa-info-circle me-2"></i>Basic Information
+            </h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-8 mb-3">
+                    <label for="title" class="form-label">Job Title *</label>
+                    <input type="text" class="form-control form-control-lg" id="title" name="title" required 
+                           placeholder="e.g., Senior Full Stack Developer">
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="category" class="form-label">Category *</label>
+                    <select class="form-control" id="category" name="category" required>
+                        <option value="">Select Category</option>
+                        {% for category in categories %}
+                        <option value="{{ category.id }}">{{ category.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="company_name" class="form-label">Company Name *</label>
+                    <input type="text" class="form-control" id="company_name" name="company_name" 
+                           placeholder="e.g., TechCorp Solutions" required>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label for="company_website" class="form-label">Company Website</label>
+                    <input type="url" class="form-control" id="company_website" name="company_website" 
+                           placeholder="https://example.com">
+                </div>
+            </div>
+            
+            <div class="mb-3">
+                <label for="company_logo" class="form-label">Company Logo</label>
+                <input type="file" class="form-control" id="company_logo" name="company_logo" accept="image/*">
+                <div class="form-text">Recommended: 200x200px, PNG or JPG</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Job Details -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">
+                <i class="fas fa-briefcase me-2"></i>Job Details
+            </h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-4 mb-3">
+                    <label for="location" class="form-label">Location *</label>
+                    <input type="text" class="form-control" id="location" name="location" required 
+                           placeholder="e.g., New York, NY">
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="job_type" class="form-label">Job Type *</label>
+                    <select class="form-control" id="job_type" name="job_type" required>
+                        <option value="">Select Job Type</option>
+                        <option value="full_time">Full Time</option>
+                        <option value="part_time">Part Time</option>
+                        <option value="contract">Contract</option>
+                        <option value="internship">Internship</option>
+                        <option value="remote">Remote</option>
+                        <option value="freelance">Freelance</option>
+                    </select>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="experience_level" class="form-label">Experience Level *</label>
+                    <select class="form-control" id="experience_level" name="experience_level" required>
+                        <option value="">Select Experience Level</option>
+                        <option value="entry">Entry Level</option>
+                        <option value="mid">Mid Level</option>
+                        <option value="senior">Senior Level</option>
+                        <option value="lead">Lead/Manager</option>
+                        <option value="executive">Executive</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-3 mb-3">
+                    <label for="salary_min" class="form-label">Salary Min</label>
+                    <div class="input-group">
+                        <span class="input-group-text">$</span>
+                        <input type="number" class="form-control" id="salary_min" name="salary_min" 
+                               placeholder="50000" min="0">
+                    </div>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <label for="salary_max" class="form-label">Salary Max</label>
+                    <div class="input-group">
+                        <span class="input-group-text">$</span>
+                        <input type="number" class="form-control" id="salary_max" name="salary_max" 
+                               placeholder="80000" min="0">
+                    </div>
+                </div>
+                <div class="col-md-2 mb-3">
+                    <label for="salary_currency" class="form-label">Currency</label>
+                    <select class="form-control" id="salary_currency" name="salary_currency">
+                        <option value="USD">USD</option>
+                        <option value="EUR">EUR</option>
+                        <option value="GBP">GBP</option>
+                        <option value="CAD">CAD</option>
+                        <option value="AUD">AUD</option>
+                    </select>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label class="form-label d-block">&nbsp;</label>
+                    <div class="form-check mt-2">
+                        <input class="form-check-input" type="checkbox" id="is_salary_negotiable" name="is_salary_negotiable">
+                        <label class="form-check-label" for="is_salary_negotiable">
+                            Salary is negotiable
+                        </label>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-4 mb-3">
+                    <label for="vacancies" class="form-label">Number of Vacancies</label>
+                    <input type="number" class="form-control" id="vacancies" name="vacancies" value="1" min="1">
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="application_deadline" class="form-label">Application Deadline</label>
+                    <input type="datetime-local" class="form-control" id="application_deadline" name="application_deadline">
+                    <div class="form-text">Leave empty for no deadline</div>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label class="form-label d-block">&nbsp;</label>
+                    <div class="mt-2">
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="checkbox" id="is_remote" name="is_remote">
+                            <label class="form-check-label" for="is_remote">
+                                <i class="fas fa-laptop-house me-1"></i>Remote Position
+                            </label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="checkbox" id="is_featured" name="is_featured">
+                            <label class="form-check-label" for="is_featured">
+                                <i class="fas fa-star me-1"></i>Featured Job
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Job Description -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">
+                <i class="fas fa-align-left me-2"></i>Job Description
+            </h5>
+        </div>
+        <div class="card-body">
+            <div class="mb-3">
+                <label for="description" class="form-label">Description *</label>
+                <textarea class="form-control ckeditor" id="description" name="description" rows="8" 
+                          placeholder="Describe the role, responsibilities, and what the candidate will be doing..."></textarea>
+            </div>
+            <div class="mb-3">
+                <label for="requirements" class="form-label">Requirements *</label>
+                <textarea class="form-control ckeditor" id="requirements" name="requirements" rows="8" 
+                          placeholder="List the required qualifications, skills, and experience..."></textarea>
+            </div>
+            <div class="mb-3">
+                <label for="benefits" class="form-label">Benefits & Perks</label>
+                <textarea class="form-control ckeditor" id="benefits" name="benefits" rows="5" 
+                          placeholder="Describe the benefits, perks, and what makes this opportunity great..."></textarea>
+            </div>
+        </div>
+    </div>
+
+    <!-- Skills Required -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">
+                <i class="fas fa-tools me-2"></i>Skills Required
+            </h5>
+        </div>
+        <div class="card-body">
+            <div class="mb-3">
+                <label for="skills_required" class="form-label">Skills (comma-separated)</label>
+                <input type="text" class="form-control" id="skills_required" name="skills_required" 
+                       placeholder="e.g., Python, JavaScript, React, Node.js, AWS">
+                <div class="form-text">Enter skills separated by commas. These help job seekers find your posting.</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Publishing Options -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">
+                <i class="fas fa-rocket me-2"></i>Publishing Options
+            </h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="status" class="form-label">Status</label>
+                    <select class="form-control" id="status" name="status">
+                        <option value="draft">Save as Draft</option>
+                        <option value="published">Publish Immediately</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center">
+                <a href="{% url 'dashboard:admin_jobs' %}" class="btn btn-outline-secondary btn-lg">
+                    <i class="fas fa-times me-2"></i>Cancel
+                </a>
+                <div>
+                    <button type="submit" name="status" value="draft" class="btn btn-outline-primary btn-lg me-2">
+                        <i class="fas fa-save me-2"></i>Save as Draft
+                    </button>
+                    <button type="submit" name="status" value="published" class="btn btn-primary btn-lg">
+                        <i class="fas fa-paper-plane me-2"></i>Publish Job
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+</div>
+
+{% endblock %}
+

@@ -1,0 +1,173 @@
+{% extends 'dashboard/base_dashboard.html' %}
+
+
+{% block dashboard_page_title %}
+<!-- page-title -->
+<section class="page-title centred pt_110">
+    <div class="auto-container">
+        <div class="content-box">
+            <h1>Application Details</h1>
+            <ul class="bread-crumb clearfix">
+                <li><a href="{% url "core:home" %}">Home</a></li>
+                <li>-</li>
+                <li>Application Details</li>
+            </ul>
+        </div>
+    </div>
+</section>
+<!-- page-title end -->
+{% endblock %}
+{% block dashboard_content %}
+<div class="row">
+    <div class="col-lg-8">
+        <!-- Application Status Card -->
+        <div class="card shadow-sm mb-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Application Details</h5>
+                <span class="badge bg-{{ application.get_status_color }} fs-6">
+                    {{ application.get_status_display }}
+                </span>
+            </div>
+            <div class="card-body">
+                <!-- Job Info -->
+                <div class="mb-4 p-3 bg-light rounded">
+                    <div class="d-flex align-items-center">
+                        {% if application.job.company_logo %}
+                        <img src="{{ application.job.company_logo.url }}" alt="{{ application.job.company_name }}" 
+                             class="me-3" width="60" height="60" style="object-fit: cover; border-radius: 8px;">
+                        {% endif %}
+                        <div>
+                            <h5 class="mb-1">{{ application.job.title }}</h5>
+                            <p class="mb-0 text-muted">{{ application.job.company_name }} - {{ application.job.location }}</p>
+                            <a href="{% url 'jobs:job_detail' application.job.slug %}" class="btn btn-sm btn-outline-primary mt-2">
+                                View Job Details
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Application Timeline -->
+                <h6 class="mb-3">Application Timeline</h6>
+                <div class="timeline">
+                    {% for event in timeline %}
+                    <div class="d-flex mb-3">
+                        <div class="me-3 text-center">
+                            <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center" 
+                                 style="width: 40px; height: 40px;">
+                                <i class="fas fa-{% if forloop.first %}paper-plane{% elif event.status == 'Hired' %}trophy{% else %}check{% endif %}"></i>
+                            </div>
+                            {% if not forloop.last %}
+                            <div class="bg-primary" style="width: 2px; height: 30px; margin: 0 auto;"></div>
+                            {% endif %}
+                        </div>
+                        <div>
+                            <strong>{{ event.status }}</strong>
+                            <p class="text-muted mb-0">{{ event.description }}</p>
+                            <small class="text-muted">{{ event.date|date:"F d, Y - h:i A" }}</small>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Cover Letter -->
+        <div class="card shadow-sm mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">Your Cover Letter</h5>
+            </div>
+            <div class="card-body">
+                <div class="p-3 bg-light rounded">
+                    {{ application.cover_letter|linebreaks }}
+                </div>
+            </div>
+        </div>
+
+        <!-- Admin Notes (if any) -->
+        {% if application.admin_notes %}
+        <div class="card shadow-sm mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">Notes from Recruiter</h5>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-info">
+                    {{ application.admin_notes|linebreaks }}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Sidebar -->
+    <div class="col-lg-4">
+        <!-- Application Info -->
+        <div class="card shadow-sm mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">Application Info</h5>
+            </div>
+            <div class="card-body">
+                <ul class="list-unstyled mb-0">
+                    <li class="mb-3">
+                        <strong>Application ID:</strong><br>
+                        <span class="text-muted">#{{ application.id }}</span>
+                    </li>
+                    <li class="mb-3">
+                        <strong>Applied On:</strong><br>
+                        <span class="text-muted">{{ application.applied_at|date:"F d, Y" }}</span>
+                    </li>
+                    <li class="mb-3">
+                        <strong>Last Updated:</strong><br>
+                        <span class="text-muted">{{ application.status_updated_at|date:"F d, Y" }}</span>
+                    </li>
+                    <li>
+                        <strong>Resume:</strong><br>
+                        <a href="{{ application.resume.url }}" class="btn btn-sm btn-outline-primary mt-1" target="_blank">
+                            <i class="fas fa-download me-1"></i> Download Resume
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="card shadow-sm mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">Actions</h5>
+            </div>
+            <div class="card-body">
+                {% if application.status == 'pending' %}
+                <a href="{% url 'dashboard:withdraw_application' application.id %}" class="btn btn-outline-danger w-100">
+                    <i class="fas fa-times me-2"></i>Withdraw Application
+                </a>
+                {% endif %}
+                
+                <a href="{% url 'dashboard:my_applications' %}" class="btn btn-outline-secondary w-100 mt-2">
+                    <i class="fas fa-arrow-left me-2"></i>Back to Applications
+                </a>
+            </div>
+        </div>
+
+        <!-- Tips -->
+        <div class="card shadow-sm">
+            <div class="card-header">
+                <h5 class="mb-0">What's Next?</h5>
+            </div>
+            <div class="card-body">
+                <ul class="list-unstyled mb-0">
+                    {% if application.status == 'pending' %}
+                    <li class="mb-2"><i class="fas fa-clock text-warning me-2"></i>Your application is being reviewed</li>
+                    <li class="mb-2"><i class="fas fa-envelope text-primary me-2"></i>You'll receive email notifications</li>
+                    <li><i class="fas fa-sync text-info me-2"></i>Check back for status updates</li>
+                    {% elif application.status == 'shortlisted' %}
+                    <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Congratulations! You've been shortlisted</li>
+                    <li><i class="fas fa-phone text-primary me-2"></i>Expect a call for interview scheduling</li>
+                    {% elif application.status == 'rejected' %}
+                    <li class="mb-2"><i class="fas fa-search text-primary me-2"></i>Keep searching for other opportunities</li>
+                    <li><i class="fas fa-sync text-info me-2"></i>Update your profile and try again</li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

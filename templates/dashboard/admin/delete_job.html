@@ -1,0 +1,100 @@
+{% extends 'dashboard/admin/admin_base.html' %}
+
+{% block admin_content %}
+
+<div class="content container-fluid">
+
+    <div class="page-header">
+        <div class="row align-items-center">
+            <div class="col">
+                <h2 class="page-title">Delete Job: {{ job.title }}</h2>
+                <p class="text-mute">Permanently remove this job listing</p>
+                <ul class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{% url 'dashboard:redirect_dashboard' %}">Dashboard</a></li>
+                    <li class="breadcrumb-item active">Delete Job</li>
+                </ul>
+            </div>
+            <div class="col-auto text-right float-right ml-auto">
+                <a href="{% url 'jobs:job_detail' job.slug %}" class="btn btn-outline-info me-2" target="_blank">
+                    <i class="fas fa-eye me-2"></i> View Job
+                </a>
+                <a href="{% url 'dashboard:admin_jobs' %}" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left me-2"></i> Back to Jobs
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-12">
+            <div class="card shadow-sm border-danger">
+                <div class="card-header bg-danger text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-exclamation-triangle me-2"></i>Delete Job
+                    </h5>
+                </div>
+                <div class="card-body p-4 text-center">
+                    <i class="fas fa-trash-alt fa-5x text-danger mb-4"></i>
+                    
+                    <h4 class="mb-3">Are you absolutely sure?</h4>
+                    
+                    <p class="lead mb-4">
+                        You are about to permanently delete the job posting:
+                    </p>
+                    
+                    <div class="bg-light p-3 rounded mb-4 text-start">
+                        <h5 class="mb-2">{{ job.title }}</h5>
+                        <p class="mb-1"><strong>Company:</strong> {{ job.company_name }}</p>
+                        <p class="mb-1"><strong>Location:</strong> {{ job.location }}</p>
+                        <p class="mb-1"><strong>Status:</strong> 
+                            <span class="badge bg-{% if job.status == 'published' %}success{% elif job.status == 'draft' %}warning{% else %}secondary{% endif %}">
+                                {{ job.get_status_display }}
+                            </span>
+                        </p>
+                        <p class="mb-1"><strong>Applications:</strong> {{ job.applications_count }}</p>
+                        <p class="mb-0"><strong>Posted:</strong> {{ job.posted_at|date:"F d, Y" }}</p>
+                    </div>
+
+                    <div class="alert alert-danger text-start">
+                        <h6 class="alert-heading">
+                            <i class="fas fa-exclamation-circle me-2"></i>This action will:
+                        </h6>
+                        <ul class="mb-0">
+                            <li>Permanently delete the job posting</li>
+                            <li>Delete all associated applications ({{ job.applications_count }} applications)</li>
+                            <li>Remove the job from all listings</li>
+                            <li>Cannot be undone</li>
+                        </ul>
+                    </div>
+
+                    <form method="POST" class="mt-4">
+                        {% csrf_token %}
+                        
+                        <div class="form-check mb-4 text-start">
+                            <input class="form-check-input" type="checkbox" id="confirmDelete" required>
+                            <label class="form-check-label text-danger" for="confirmDelete">
+                                <strong>I understand that this action is irreversible and I want to delete this job permanently.</strong>
+                            </label>
+                        </div>
+                        
+                        <div class="d-flex justify-content-center gap-3">
+                            <a href="{% url 'dashboard:admin_jobs' %}" class="btn btn-outline-secondary me-3">
+                                <i class="fas fa-arrow-left me-3"></i> Cancel
+                            </a> &nbsp; &nbsp;
+                            <button type="submit" class="btn btn-danger me-3" id="deleteBtn" disabled>
+                                <i class="fas fa-trash me-3"></i> Delete Permanently
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.getElementById('confirmDelete').addEventListener('change', function() {
+    document.getElementById('deleteBtn').disabled = !this.checked;
+});
+</script>
+{% endblock %}

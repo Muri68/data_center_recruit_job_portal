@@ -1,0 +1,163 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Contact Us - {{ site_name }}{% endblock %}
+
+{% block content %}
+
+<!-- page-title -->
+<section class="page-title centred pt_110">
+<section class="page-title centred pt_110">
+    <div class="auto-container">
+        <div class="content-box">
+            <h1>Contact us</h1>
+            <ul class="bread-crumb clearfix">
+                <li><a href="{% url 'core:home' %}">Home</a></li>
+                <li>-</li>
+                <li>Contact us</li>
+            </ul>
+        </div>
+    </div>
+</section>
+<!-- page-title end -->
+
+
+<!-- contact-section -->
+<section class="contact-section pt_110 pb_30">
+    <div class="auto-container">
+        <div class="inner-container">
+            <div class="row clearfix">
+                <div class="col-lg-4 col-md-12 col-sm-12 info-column">
+                    <div class="info-box">
+                        <h3>Contact Information</h3>
+                        {% if site_settings %}
+                            {% if site_settings.address %}
+                        <div class="single-item">
+                            <div class="icon-box"><img src="{% static 'images/icons/icon-27.png' %}" alt=""></div>
+                            <h4>Address</h4>
+                            <p>{{ site_settings.address }}</p>
+                        </div>
+                        {% endif %}
+                        {% if site_settings.email %}
+                        <div class="single-item">
+                            <div class="icon-box"><img src="{% static 'images/icons/icon-28.png' %}" alt=""></div>
+                            <h4>Email Address</h4>
+                            <p><a href="mailto:support@example.com">support@example.com</a><br /><a
+                                    href="mailto:contact@example.com">{{ site_settings.email }}</a></p>
+                        </div>
+                        {% endif %}
+                        {% if site_settings.phone %}
+                        <div class="single-item">
+                            <div class="icon-box"><img src="{% static 'images/icons/icon-29.png' %}" alt=""></div>
+                            <h4>Phone Number</h4>
+                            <p><a href="tel:2085440141">{{ site_settings.phone }}</a><br /><a
+                                    href="tel:2085440142">+(208) 544 -0142</a></p>
+                        </div>
+                        {% endif %}
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="col-lg-8 col-md-12 col-sm-12 content-column">
+                        <h2 class="my-3">Send us a Message</h2>
+                        {% if messages %}
+                        {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                        {% endfor %}
+                        {% endif %}
+                    <div class="form-inner">
+                        <form method="POST" id="contact-form">
+                            {% csrf_token %}
+                            <div class="row clearfix">
+                                <div class="col-lg-6 col-md-6 col-sm-12 form-group">
+                                    <label>Name <span>*</span></label>
+                                    <input type="text" id="name" name="name" required 
+                                           placeholder="John Doe"
+                                           value="{{ request.user.get_full_name|default:'' }}" required>
+                                </div>
+                                <div class="col-lg-6 col-md-6 col-sm-12 form-group">                                    
+                                    <label for="email" class="form-label">Email Address *</label>
+                                    <input type="email" id="email" name="email" required 
+                                           placeholder="john@example.com"
+                                           value="{{ request.user.email|default:'' }}">
+                                </div>
+                                <div class="col-lg-12 col-md-12 col-sm-12 form-group">
+                                <label for="subject" class="form-label">Subject *</label>
+                                <select class="form-select" id="subject" name="subject" required>
+                                    <option value="">Choose a subject...</option>
+                                    <option value="General Inquiry">General Inquiry</option>
+                                    <option value="Job Posting">Job Posting</option>
+                                    <option value="Account Help">Account Help</option>
+                                    <option value="Technical Support">Technical Support</option>
+                                    <option value="Partnership">Partnership Opportunity</option>
+                                    <option value="Feedback">Feedback</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                                </div>
+                                <div class="col-lg-12 col-md-12 col-sm-12 form-group">
+                                    <label for="message">Write Message *</label>
+                                    <textarea id="message" name="message" rows="6" 
+                                          required placeholder="Your message here..."></textarea>
+                                </div>
+                                <div class="col-lg-12 col-md-12 col-sm-12 form-group message-btn">
+                                    <button type="submit" class="theme-btn btn-one" name="submit-form">
+                                        <i class="fas fa-paper-plane me-2"></i>Send Message
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- contact-section end -->
+
+
+
+<!-- google-map -->
+ {% if site_settings and site_settings.google_map_embed %}
+<section class="google-map pb_80">
+    <div class="auto-container">
+        <div class="inner-container">
+            {{ site_settings.google_map_embed|safe }}
+        </div>
+    </div>
+</section>
+{% endif %}
+<!-- google-map end -->
+
+
+<!-- FAQ Section -->
+<section class="py-5 bg-light">
+    <div class="container">
+        {% if site_settings %}
+        <h2 class="text-center pb-2">Frequently Asked Questions</h2>
+        <p class="text-muted lead mb-5">{{ site_settings.faq_subtitle }}</p>
+        {% endif %}
+        <div class="row">
+            <div class="col-md-10 mx-auto">
+                <div class="accordion" id="faqAccordion">
+                    {% for faq in faqs %}
+                    <div class="accordion-item">
+                        <h3 class="accordion-header" id="heading{{ forloop.counter }}">
+                            <button class="accordion-button {% if not forloop.first %}collapsed{% endif %}" type="button" data-bs-toggle="collapse" data-bs-target="#faq{{ forloop.counter }}" aria-expanded="{% if forloop.first %}true{% else %}false{% endif %}" aria-controls="faq{{ forloop.counter }}">
+                                {{ faq.question }}
+                            </button>
+                        </h3>
+                        <div id="faq{{ forloop.counter }}" class="accordion-collapse collapse {% if forloop.first %}show{% endif %}" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                {{ faq.answer }}
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

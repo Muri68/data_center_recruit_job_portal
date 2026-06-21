@@ -1,0 +1,144 @@
+{% extends 'dashboard/admin/admin_base.html' %}
+
+{% block admin_content %}
+
+<div class="content container-fluid">
+    <h2 class="mb-4">
+        <i class="fas fa-chart-bar me-2"></i>Reports & Analytics
+    </h2>
+
+    <!-- Summary Cards -->
+    <div class="row mb-4">
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-primary shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                        Total Applications
+                    </div>
+                    <div class="h5 mb-0 font-weight-bold text-gray-800">{{ funnel.applied }}</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-success shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                        Hired
+                    </div>
+                    <div class="h5 mb-0 font-weight-bold text-gray-800">{{ funnel.hired }}</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-warning shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                        In Progress
+                    </div>
+                    <div class="h5 mb-0 font-weight-bold text-gray-800">
+                        {{ funnel.reviewed|add:funnel.shortlisted|add:funnel.interviewed }}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-danger shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="text-xs font-weight-bold text-danger text-uppercase mb-1">
+                        Rejected
+                    </div>
+                    <div class="h5 mb-0 font-weight-bold text-gray-800">{{ funnel.rejected }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Hiring Funnel -->
+        <div class="col-lg-6 mb-4">
+            <div class="card shadow-sm">
+                <div class="card-header">
+                    <h5 class="mb-0">Hiring Funnel</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="funnelChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Category Stats -->
+        <div class="col-lg-6 mb-4">
+            <div class="card shadow-sm">
+                <div class="card-header">
+                    <h5 class="mb-0">Jobs by Category</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Category</th>
+                                    <th>Total Jobs</th>
+                                    <th>Active Jobs</th>
+                                    <th>Applications</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for stat in category_stats %}
+                                <tr>
+                                    <td>{{ stat.name }}</td>
+                                    <td>{{ stat.total_jobs }}</td>
+                                    <td>{{ stat.active_jobs }}</td>
+                                    <td>{{ stat.total_applications }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+// Funnel Chart
+const funnelCtx = document.getElementById('funnelChart').getContext('2d');
+new Chart(funnelCtx, {
+    type: 'bar',
+    data: {
+        labels: ['Applied', 'Reviewed', 'Shortlisted', 'Interviewed', 'Offered', 'Hired', 'Rejected'],
+        datasets: [{
+            label: 'Applications',
+            data: [
+                {{ funnel.applied }},
+                {{ funnel.reviewed }},
+                {{ funnel.shortlisted }},
+                {{ funnel.interviewed }},
+                {{ funnel.offered }},
+                {{ funnel.hired }},
+                {{ funnel.rejected }}
+            ],
+            backgroundColor: [
+                '#4e73df', '#36b9cc', '#1cc88a', '#f6c23e', '#e74a3b', '#28a745', '#dc3545'
+            ]
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: {
+            legend: { display: false }
+        },
+        scales: {
+            y: {
+                beginAtZero: true,
+                ticks: { stepSize: 1 }
+            }
+        }
+    }
+});
+</script>
+{% endblock %}
+{% endblock %}

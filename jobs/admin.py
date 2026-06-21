@@ -7,6 +7,9 @@ class JobCategoryAdmin(admin.ModelAdmin):
     prepopulated_fields = {'slug': ('name',)}
     search_fields = ('name',)
 
+from django.contrib import admin
+from .models import Job, JobCategory, JobApplication
+
 @admin.register(Job)
 class JobAdmin(admin.ModelAdmin):
     list_display = ('title', 'company_name', 'location', 'job_type', 'status', 'posted_by', 'posted_at')
@@ -14,7 +17,8 @@ class JobAdmin(admin.ModelAdmin):
     search_fields = ('title', 'company_name', 'location', 'description')
     prepopulated_fields = {'slug': ('title',)}
     date_hierarchy = 'posted_at'
-    filter_horizontal = ('skills_required',)
+    # Remove filter_horizontal if skills_required uses a through model
+    # filter_horizontal = ('skills_required',)  # Comment this out
     
     fieldsets = (
         ('Basic Information', {

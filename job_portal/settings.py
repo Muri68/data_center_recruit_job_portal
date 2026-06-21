@@ -147,7 +147,13 @@ AUTHENTICATION_BACKENDS = [
     'allauth.account.auth_backends.AuthenticationBackend',
 ]
 
-# Allauth settings
+
+# ============================================
+# Allauth Settings (Django 4.2 / allauth 0.57.0)
+# ============================================
+SITE_ID = 1
+
+# Use this for allauth 0.57.0 (NOT deprecated)
 ACCOUNT_USER_MODEL_USERNAME_FIELD = None
 ACCOUNT_AUTHENTICATION_METHOD = 'email'
 ACCOUNT_USERNAME_REQUIRED = False
@@ -166,7 +172,6 @@ ACCOUNT_FORMS = {
     'signup': 'accounts.forms.CustomSignupForm',
 }
 
-SITE_ID = 1
 
 # Social Account settings
 SOCIALACCOUNT_PROVIDERS = {

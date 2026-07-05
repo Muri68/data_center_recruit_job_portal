@@ -64,7 +64,7 @@
 
 
 <!-- chooseus-section -->
-<section class="chooseus-section alternat-2 pt_120 pb_90">
+{% comment %} <section class="chooseus-section alternat-2 pt_120 pb_90">
     <div class="auto-container">
         {% if site_settings %}
         <div class="sec-title pb_60 sec-title-animation animation-style2">
@@ -103,9 +103,39 @@
         </div>
 
     </div>
-</section>
+</section> {% endcomment %}
 <!-- chooseus-section end -->
 
+
+<!-- industries-style-two -->
+{% if categories %}
+<section class="industries-style-two pt_120 pb_90">
+    <div class="pattern-layer" style="background-image: url({% static 'images/shape/shape-3.png' %});"></div>
+    <div class="auto-container">
+
+        <div class="sec-title light centred pb_60 sec-title-animation animation-style2">
+            <span class="sub-title mb_10 title-animation">Job Categories</span>
+            <h2 class="title-animation">Browse by Category</h2>
+        </div>
+
+        <div class="row clearfix">
+            {% for category in categories %}
+            <div class="col-lg-4 col-md-6 col-sm-12 industries-block">
+                <div class="industries-block-two">
+                    <div class="inner-box">
+                        <div class="icon-box"><i class="{{ category.icon }}"></i></div>
+                        <h3><a href="{% url 'jobs:job_list' %}?category={{ category.slug }}">{{ category.name }}</a></h3>
+                        <p>{{ category.jobs.count }} Jobs Available</p>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+<!-- industries-style-two end -->
+ 
 
 <!-- job-section -->
  {% if featured_jobs %}
@@ -158,34 +188,6 @@
 
 
 
-<!-- industries-style-two -->
-{% if categories %}
-<section class="industries-style-two pt_120 pb_90">
-    <div class="pattern-layer" style="background-image: url({% static 'images/shape/shape-3.png' %});"></div>
-    <div class="auto-container">
-
-        <div class="sec-title light centred pb_60 sec-title-animation animation-style2">
-            <span class="sub-title mb_10 title-animation">Job Categories</span>
-            <h2 class="title-animation">Browse by Category</h2>
-        </div>
-
-        <div class="row clearfix">
-            {% for category in categories %}
-            <div class="col-lg-4 col-md-6 col-sm-12 industries-block">
-                <div class="industries-block-two">
-                    <div class="inner-box">
-                        <div class="icon-box"><i class="{{ category.icon }}"></i></div>
-                        <h3><a href="{% url 'jobs:job_list' %}?category={{ category.slug }}">{{ category.name }}</a></h3>
-                        <p>{{ category.jobs.count }} Jobs Available</p>
-                    </div>
-                </div>
-            </div>
-            {% endfor %}
-        </div>
-    </div>
-</section>
-{% endif %}
-<!-- industries-style-two end -->
 
 
 <!-- news-section -->

@@ -1,0 +1,93 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ page.title }} - {{ site_name }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .legal-page-content {
+        max-width: 900px;
+        margin: 0 auto;
+        line-height: 1.8;
+    }
+    
+    .legal-page-content h1 {
+        font-size: 2.5rem;
+        margin-bottom: 1rem;
+        color: #333;
+    }
+    
+    .legal-page-content h2 {
+        font-size: 1.8rem;
+        margin-top: 2rem;
+        margin-bottom: 1rem;
+        color: #444;
+    }
+    
+    .legal-page-content h3 {
+        font-size: 1.4rem;
+        margin-top: 1.5rem;
+        margin-bottom: 0.75rem;
+        color: #555;
+    }
+    
+    .legal-page-content p {
+        margin-bottom: 1rem;
+        color: #666;
+    }
+    
+    .legal-page-content ul, 
+    .legal-page-content ol {
+        margin-bottom: 1rem;
+        padding-left: 2rem;
+    }
+    
+    .legal-page-content li {
+        margin-bottom: 0.5rem;
+        color: #666;
+    }
+    
+    .last-updated {
+        background: #f8f9fa;
+        padding: 15px;
+        border-radius: 8px;
+        margin-bottom: 30px;
+    }
+    
+    .last-updated i {
+        color: #007bff;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- page-title -->
+<section class="page-title centred pt_50">
+    <div class="auto-container">
+        <div class="content-box">
+            <h1>{{ page.title }}</h1>
+            <ul class="bread-crumb clearfix">
+                <li><a href="{% url 'core:home' %}">Home</a></li>
+                <li>-</li>
+                <li>{{ page.title }}</li>
+            </ul>
+        </div>
+    </div>
+</section>
+<!-- page-title end -->
+
+<section class="py-5">
+    <div class="container">
+        <div class="legal-page-content">
+            <div class="last-updated">
+                <i class="fas fa-clock me-2"></i>
+                <strong>Last Updated:</strong> {{ page.last_updated|date:"F d, Y" }}
+            </div>
+            
+            <div class="content">
+                {{ page.content|safe }}
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

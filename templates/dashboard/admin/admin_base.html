@@ -136,9 +136,14 @@
                            <i class="fas fa-award"></i> <span>Why Choose Us</span>
                         </a>
                   </li>
+                  <li class="{% if 'why_choose_us' in request.resolver_match.url_name %}active{% endif %}">
+                        <a href="{% url 'dashboard:admin_legal_pages' %}">
+                           <i class="fas fa-file-contract"></i> <span>Legal Pages</span>
+                        </a>
+                  </li>
                   <li class="{% if 'faq' in request.resolver_match.url_name and 'admin' in request.resolver_match.url_name %}active{% endif %}">
                         <a href="{% url 'dashboard:admin_faqs' %}">
-                           <i class="fas fa-circle-question"></i> <span>FAQs</span>
+                           <i class="fas fa-question"></i> <span>FAQs</span>
                         </a>
                   </li>
                   <li class="{% if 'blog' in request.resolver_match.url_name %}active{% endif %}">

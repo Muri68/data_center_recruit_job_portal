@@ -84,3 +84,19 @@ def job_detail(request, slug):
         'page_title': job.title,
     }
     return render(request, 'jobs/job_detail.html', context)
+
+
+def job_categories(request):
+    categories = JobCategory.objects.all()
+    
+    # Job statistics
+    total_jobs = Job.objects.filter(status='published').count()
+    total_companies = Job.objects.filter(status='published').values('company_name').distinct().count()
+    
+    context = {
+        'categories': categories,
+        'total_jobs': total_jobs,
+        'total_companies': total_companies,
+        'page_title': 'Job Categories',
+    }
+    return render(request, 'jobs/categories.html', context)

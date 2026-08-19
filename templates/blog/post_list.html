@@ -3,15 +3,151 @@
 
 {% block title %}Blog - {{ site_name }}{% endblock %}
 
+{% block extra_css %}
+    <style>
+        /* Mobile Carousel Enhancements */
+        @media (max-width: 767px) {
+            #recentPostsCarousel {
+                padding: 10px;
+                background: #f8f9fa;
+                border-radius: 10px;
+            }
+            
+            #recentPostsCarousel .carousel-inner {
+                border-radius: 8px;
+                overflow: hidden;
+            }
+            
+            #recentPostsCarousel .carousel-item {
+                transition: transform 0.6s ease-in-out;
+            }
+            
+            #recentPostsCarousel .post {
+                display: block !important;
+                padding: 15px;
+                background: white;
+                border-radius: 8px;
+                box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+                margin: 5px;
+            }
+            
+            #recentPostsCarousel .post-thumb {
+                display: block !important;
+                width: 100% !important;
+                margin: 0 0 15px 0 !important;
+            }
+            
+            #recentPostsCarousel .post-thumb img {
+                display: block !important;
+                width: 100% !important;
+                height: 180px !important;
+                object-fit: cover !important;
+                border-radius: 8px !important;
+            }
+            
+            #recentPostsCarousel h6 {
+                display: block !important;
+                width: 100% !important;
+                margin: 0 0 10px 0 !important;
+                padding: 0 10px !important;
+            }
+            
+            #recentPostsCarousel h6 a {
+                display: block !important;
+                width: 100% !important;
+                text-align: center !important;
+            }
+            
+            #recentPostsCarousel .post-date {
+                display: block !important;
+                width: 100% !important;
+                text-align: center !important;
+            }
+            
+            #recentPostsCarousel .post-thumb img:hover {
+                transform: scale(1.02);
+            }
+            
+            #recentPostsCarousel .carousel-indicators {
+                margin-bottom: 0;
+            }
+            
+            #recentPostsCarousel .carousel-indicators button {
+                transition: all 0.3s ease;
+            }
+            
+            #recentPostsCarousel .carousel-indicators button.active {
+                background-color: #007bff !important;
+                width: 20px !important;
+                border-radius: 10px !important;
+            }
+        }
+        
+        /* Tags Widget Styles */
+        .tags-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .tags-list li {
+            display: inline-block;
+            margin: 0 5px 10px 0;
+        }
+        
+        .tags-list li a {
+            display: inline-flex;
+            align-items: center;
+            padding: 8px 15px;
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 25px;
+            color: #495057;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+        
+        .tags-list li a:hover {
+            background: #007bff;
+            color: #ffffff;
+            border-color: #007bff;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 123, 255, 0.2);
+        }
+        
+        .tag-count {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 20px;
+            height: 20px;
+            margin-left: 8px;
+            padding: 0 6px;
+            background: #e9ecef;
+            border-radius: 10px;
+            font-size: 0.75rem;
+            color: #6c757d;
+            transition: all 0.3s ease;
+        }
+        
+        .tags-list li a:hover .tag-count {
+            background: rgba(255, 255, 255, 0.3);
+            color: #ffffff;
+        }
+    </style>
+{% endblock %}
+
+
 {% block content %}
 
 <!-- page-title -->
-<section class="page-title centred pt_110 blog-page-title">
+<section class="page-title centred pt_50 blog-page-title">
     <div class="auto-container">
         <div class="content-box">
             <h1>Blog</h1>
             <ul class="bread-crumb clearfix">
-                <li><a href="index.html">Home</a></li>
+                <li><a href="{% url 'core:home' %}">Home</a></li>
                 <li>-</li>
                 <li>Blog Posts</li>
             </ul>
@@ -27,16 +163,25 @@
         <div class="row clearfix">
             <div class="col-lg-4 col-md-12 col-sm-12 sidebar-side">
                 <div class="blog-sidebar mr_40 mb_30">
+                    <!-- Search Widget -->
                     <div class="search-widget mb_60">
                         <div class="search-form">
                             <form action="{% url 'blog:post_list' %}" method="GET">
                                 <div class="form-group">
-                                    <input type="text" class="form-control" name="q" placeholder="Search posts...">
+                                    <input type="text" class="form-control" name="q" placeholder="Search posts..." value="{{ request.GET.q }}">
+                                    {% if request.GET.tag %}
+                                    <input type="hidden" name="tag" value="{{ request.GET.tag }}">
+                                    {% endif %}
+                                    {% if request.GET.category %}
+                                    <input type="hidden" name="category" value="{{ request.GET.category }}">
+                                    {% endif %}
                                     <button type="submit"><i class="icon-1"></i></button>
                                 </div>
                             </form>
                         </div>
                     </div>
+                    
+                    <!-- Categories Widget -->
                     <div class="sidebar-widget category-widget mb_50">
                         <div class="widget-title mb_11">
                             <h3>Categories</h3>
@@ -44,64 +189,168 @@
                         <div class="widget-content">
                             <ul class="category-list clearfix">
                                 <li class="{% if not category_slug %}current{% endif %}">
-                                    <a href="{% url 'blog:post_list' %}" class="text-decoration-none {% if not category_slug %}text-dark{% endif %} d-flex justify-content-between align-items-center">
+                                    <a href="{% url 'blog:post_list' %}{% if request.GET.tag %}?tag={{ request.GET.tag }}{% endif %}" 
+                                       class="text-decoration-none {% if not category_slug %}text-dark{% endif %} d-flex justify-content-between align-items-center">
                                         All Categories
                                         <span class="badge {% if not category_slug %}bg-light text-primary{% else %}bg-primary{% endif %} rounded-pill">
-                                            {{ posts.paginator.count }}
+                                            {{ total_posts_count }}
                                         </span>
                                     </a>
                                 </li>
                                 {% for category in categories %}
-                                <li><a href="?category={{ category.slug }}">{{ category.name }}<span>({{ category.posts.count }})</span></a></li>
+                                <li>
+                                    <a href="{% url 'blog:post_list' %}?category={{ category.slug }}{% if request.GET.tag %}&tag={{ request.GET.tag }}{% endif %}">
+                                        {{ category.name }}
+                                        <span>({{ category.post_count }})</span>
+                                    </a>
+                                </li>
                                 {% endfor %}
                             </ul>
                         </div>
                     </div>
+                    
+                    <!-- Recent Posts Widget -->
                     <div class="sidebar-widget post-widget mb_60">
                         <div class="widget-title mb_20">
                             <h3>Recent Posts</h3>
                         </div>
                         <div class="post-inner">
-                            {% if posts %}
-                            {% for recent_post in posts|slice:":5" %}
-                            <div class="post">
-                                <figure class="post-thumb">
-                                    {% if recent_post.featured_image %}
-                                        <a href="{% url 'blog:post_detail' recent_post.slug %}">
-                                            <img src="{{ recent_post.featured_image.url }}" alt="">
-                                        </a>
+                            {% if recent_posts %}
+                            <!-- Desktop View -->
+                            <div class="d-none d-md-block">
+                                {% for recent_post in recent_posts %}
+                                <div class="post">
+                                    <figure class="post-thumb">
+                                        {% if recent_post.featured_image %}
+                                            <a href="{% url 'blog:post_detail' recent_post.slug %}">
+                                                <img src="{{ recent_post.featured_image.url }}" alt="{{ recent_post.title }}">
+                                            </a>
                                         {% else %}
-                                        <div class="bg-light d-flex align-items-center justify-content-center me-3" 
-                                            style="width: 80px; height: 60px; border-radius: 4px;">
-                                            <i class="fas fa-newspaper text-muted"></i>
-                                        </div>
-                                    {% endif %}
-                                </figure>
-                                <h6><a href="{% url 'blog:post_detail' recent_post.slug %}">{{ recent_post.title }}</a></h6>
-                                <span class="post-date">{{ recent_post.published_at|date:"M d, Y" }}</span>
+                                            <div class="bg-light d-flex align-items-center justify-content-center me-3" 
+                                                style="width: 80px; height: 60px; border-radius: 4px;">
+                                                <i class="fas fa-newspaper text-muted"></i>
+                                            </div>
+                                        {% endif %}
+                                    </figure>
+                                    <h6><a href="{% url 'blog:post_detail' recent_post.slug %}">{{ recent_post.title }}</a></h6>
+                                    <span class="post-date">{{ recent_post.published_at|date:"M d, Y" }}</span>
+                                </div>
+                                {% endfor %}
                             </div>
-                            {% endfor %}
+                            
+                            <!-- Mobile Carousel -->
+                            <div id="recentPostsCarousel" class="carousel slide d-md-none" data-bs-ride="carousel" data-bs-interval="3000">
+                                <div class="carousel-inner">
+                                    {% for recent_post in recent_posts %}
+                                    <div class="carousel-item {% if forloop.first %}active{% endif %}">
+                                        <div class="post" style="display: block; text-align: center;">
+                                            <!-- Image on top - Full width block -->
+                                            <figure class="post-thumb" style="display: block; width: 100%; margin: 0 0 15px 0;">
+                                                {% if recent_post.featured_image %}
+                                                    <a href="{% url 'blog:post_detail' recent_post.slug %}" style="display: block; width: 100%;">
+                                                        <img src="{{ recent_post.featured_image.url }}" 
+                                                            alt="{{ recent_post.title }}" 
+                                                            style="display: block; width: 100%; height: 180px; object-fit: cover; border-radius: 8px;">
+                                                    </a>
+                                                {% else %}
+                                                    <div class="bg-light d-flex align-items-center justify-content-center" 
+                                                        style="display: flex; width: 100%; height: 180px; border-radius: 8px;">
+                                                        <i class="fas fa-newspaper fa-3x text-muted"></i>
+                                                    </div>
+                                                {% endif %}
+                                            </figure>
+                                            
+                                            <!-- Title below - Block element -->
+                                            <h6 style="display: block; margin: 0 0 10px 0;">
+                                                <a href="{% url 'blog:post_detail' recent_post.slug %}" 
+                                                style="display: block; color: #333; text-decoration: none; font-weight: 600; font-size: 1rem; line-height: 1.4;">
+                                                    {{ recent_post.title }}
+                                                </a>
+                                            </h6>
+                                            
+                                            <!-- Date below title - Block element -->
+                                            <span class="post-date" style="display: block; color: #777; font-size: 0.85rem;">
+                                                <i class="far fa-calendar-alt me-1"></i>
+                                                {{ recent_post.published_at|date:"M d, Y" }}
+                                            </span>
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                                
+                                <!-- Indicators -->
+                                <div class="carousel-indicators" style="position: relative; margin-top: 15px; bottom: 0;">
+                                    {% for recent_post in recent_posts %}
+                                    <button type="button" 
+                                            data-bs-target="#recentPostsCarousel" 
+                                            data-bs-slide-to="{{ forloop.counter0 }}" 
+                                            class="{% if forloop.first %}active{% endif %}"
+                                            aria-current="{% if forloop.first %}true{% endif %}"
+                                            aria-label="Slide {{ forloop.counter }}"
+                                            style="width: 10px; height: 10px; border-radius: 50%; background-color: {% if forloop.first %}#007bff{% else %}#ccc{% endif %}; border: none; margin: 0 5px;">
+                                    </button>
+                                    {% endfor %}
+                                </div>
+                            </div>
                             {% endif %}
                         </div>
                     </div>
+                    
+                    <!-- Popular Tags Widget -->
                     <div class="sidebar-widget tags-widget mb_45">
                         <div class="widget-title mb_20">
-                            <h3>Popular tag</h3>
+                            <h3>Popular Tags</h3>
                         </div>
                         <div class="widget-content">
                             <ul class="tags-list clearfix">
-                                <li><a href="blog-details.html">Software Development</a></li>
-                                <li><a href="blog-details.html">Careers</a></li>
-                                <li><a href="blog-details.html">AI</a></li>
-                                <li><a href="blog-details.html">Development</a></li>
-                                <li><a href="blog-details.html">Technology</a></li>
+                                {% for tag in popular_tags %}
+                                <li>
+                                    <a href="{% url 'blog:post_list' %}?tag={{ tag.slug }}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}"
+                                       class="{% if tag_slug == tag.slug %}active{% endif %}">
+                                        {{ tag.name }}
+                                        <span class="tag-count">({{ tag.num_times }})</span>
+                                    </a>
+                                </li>
+                                {% empty %}
+                                <li>No tags yet</li>
+                                {% endfor %}
                             </ul>
                         </div>
                     </div>
                 </div>
             </div>
+            
+            <!-- Main Content -->
             <div class="col-lg-8 col-md-12 col-sm-12 content-side">
                 <div class="blog-standard-content">
+                    <!-- Active Filters Display -->
+                    {% if category_slug or tag_slug or query %}
+                    <div class="mb-4 p-3 bg-light rounded">
+                        <small>
+                            <strong>Active filters:</strong>
+                            {% if category_slug %}
+                                <span class="badge bg-primary me-1">
+                                    Category: {{ category_slug }}
+                                    <a href="{% url 'blog:post_list' %}{% if request.GET.tag %}?tag={{ request.GET.tag }}{% endif %}" class="text-white text-decoration-none">&times;</a>
+                                </span>
+                            {% endif %}
+                            {% if tag_slug %}
+                                <span class="badge bg-primary me-1">
+                                    Tag: {{ tag_slug }}
+                                    <a href="{% url 'blog:post_list' %}{% if request.GET.category %}?category={{ request.GET.category }}{% endif %}" class="text-white text-decoration-none">&times;</a>
+                                </span>
+                            {% endif %}
+                            {% if query %}
+                                <span class="badge bg-primary me-1">
+                                    Search: {{ query }}
+                                    <a href="{% url 'blog:post_list' %}" class="text-white text-decoration-none">&times;</a>
+                                </span>
+                            {% endif %}
+                            <a href="{% url 'blog:post_list' %}" class="text-decoration-none ms-2">Clear all</a>
+                        </small>
+                    </div>
+                    {% endif %}
+                    
                     {% if posts %}
                     {% for post in posts %}
                     <div class="news-block-two wow fadeInUp animated" data-wow-delay="00ms"
@@ -124,40 +373,55 @@
                                 <span class="category">{{ post.category.name }}</span>
                                 <h3><a href="{% url 'blog:post_detail' post.slug %}">{{ post.title }}</a></h3>
                                 <ul class="post-info">
-                                    <li>By <a href="blog-details.html">
+                                    <li>
                                         <div class="d-flex align-items-center">
-                                    {% if post.author.profile_picture %}
-                                    <img src="{{ post.author.profile_picture.url }}" alt="{{ post.author.get_full_name }}" 
-                                         class="rounded-circle me-2" width="30" height="30">
-                                    {% else %}
-                                    <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-2" 
-                                         style="width: 30px; height: 30px; font-size: 0.8rem;">
-                                        {{ post.author.get_full_name|first|upper }}
-                                    </div>
-                                    {% endif %}
-                                    <small class="text-muted">
-                                        By <strong>{{ post.author.get_full_name }}</strong>
-                                    </small>
-                                </div>
-                                    </a></li>
+                                            {% if post.author.profile_picture %}
+                                            <img src="{{ post.author.profile_picture.url }}" alt="{{ post.author.get_full_name }}" 
+                                                 class="rounded-circle me-2" width="30" height="30">
+                                            {% else %}
+                                            <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-2" 
+                                                 style="width: 30px; height: 30px; font-size: 0.8rem;">
+                                                {{ post.author.get_full_name|first|upper }}
+                                            </div>
+                                            {% endif %}
+                                            <small class="text-muted">
+                                                By <strong>{{ post.author.get_full_name }}</strong>
+                                            </small>
+                                        </div>
+                                    </li>
                                     <li><span>{{ post.published_at|date:"M d, Y" }}</span></li>
                                 </ul>
                             </div>
                         </div>
                     </div>
                     {% endfor %}
-                    {% else %}
-                        <p class="text-muted text-center mb-0">No posts yet.</p>
-                    {% endif %}
+                    
+                    <!-- Pagination -->
+                    {% if posts.has_other_pages %}
                     <div class="pagination-wrapper">
                         <ul class="pagination clearfix">
-                            <li><a href="blog-2.html"><i class="icon-34"></i></a></li>
-                            <li><a href="blog-2.html" class="current">1</a></li>
-                            <li><a href="blog-2.html">2</a></li>
-                            <li><a href="blog-2.html">3</a></li>
-                            <li><a href="blog-2.html"><i class="icon-35"></i></a></li>
+                            {% if posts.has_previous %}
+                            <li><a href="?page={{ posts.previous_page_number }}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}{% if request.GET.tag %}&tag={{ request.GET.tag }}{% endif %}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}"><i class="icon-34"></i></a></li>
+                            {% endif %}
+                            
+                            {% for num in posts.paginator.page_range %}
+                                {% if posts.number == num %}
+                                <li><a href="?page={{ num }}" class="current">{{ num }}</a></li>
+                                {% elif num > posts.number|add:'-3' and num < posts.number|add:'3' %}
+                                <li><a href="?page={{ num }}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}{% if request.GET.tag %}&tag={{ request.GET.tag }}{% endif %}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}">{{ num }}</a></li>
+                                {% endif %}
+                            {% endfor %}
+                            
+                            {% if posts.has_next %}
+                            <li><a href="?page={{ posts.next_page_number }}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}{% if request.GET.tag %}&tag={{ request.GET.tag }}{% endif %}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}"><i class="icon-35"></i></a></li>
+                            {% endif %}
                         </ul>
                     </div>
+                    {% endif %}
+                    
+                    {% else %}
+                        <p class="text-muted text-center mb-0">No posts found.</p>
+                    {% endif %}
                 </div>
             </div>
         </div>
@@ -165,4 +429,38 @@
 </section>
 <!-- sidebar-page-container end -->
 
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Custom auto-slide with pause on hover
+    document.addEventListener('DOMContentLoaded', function() {
+        const carousel = document.getElementById('recentPostsCarousel');
+        if (carousel && window.innerWidth <= 767) {
+            const bsCarousel = new bootstrap.Carousel(carousel, {
+                interval: 3000, // Auto slide every 3 seconds
+                ride: 'carousel',
+                pause: 'hover' // Pause on hover
+            });
+            
+            // Pause when user interacts
+            carousel.addEventListener('mouseenter', () => {
+                bsCarousel.pause();
+            });
+            
+            carousel.addEventListener('mouseleave', () => {
+                bsCarousel.cycle();
+            });
+            
+            // Pause on touch
+            carousel.addEventListener('touchstart', () => {
+                bsCarousel.pause();
+            });
+            
+            carousel.addEventListener('touchend', () => {
+                setTimeout(() => bsCarousel.cycle(), 3000);
+            });
+        }
+    });
+</script>
 {% endblock %}

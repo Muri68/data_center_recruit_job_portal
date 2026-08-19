@@ -235,6 +235,9 @@
         }
     </style>
 
+    <!-- Extra CSS Block -->
+    {% block extra_css %}{% endblock %}
+
 </head>
 
 
@@ -340,7 +343,7 @@
                                         <li class="{% if request.resolver_match.url_name == 'home' and request.resolver_match.namespace == 'core' %}current{% endif %}">
                                             <a href="{% url 'core:home' %}">Home</a>
                                         </li>
-                                        <li class="{% if request.resolver_match.url_name == 'about' and request.resolver_match.namespace == 'core' %}current{% endif %}">
+                                        <li class="./">
                                             <a href="{% url 'core:about' %}">About</a>
                                         </li>
                                         <li class="{% if request.resolver_match.url_name == 'job_list' and request.resolver_match.namespace == 'jobs' %}current{% endif %}">
@@ -538,7 +541,7 @@
                                 <div class="widget-content">
                                     <ul class="links-list clearfix">
                                         <li><a href="{% url 'jobs:job_list' %}">Job Listings</a></li>
-                                        <li><a href="job-listening.html">Job Categories</a></li>
+                                        <li><a href="{% url "jobs:job_categories" %}">Job Categories</a></li>
                                     </ul>
                                 </div>
                             </div>
@@ -550,11 +553,10 @@
                                 </div>
                                 <div class="widget-content">
                                     <ul class="links-list clearfix">
-                                        <li><a href="contact.html">Contact Us</a></li>
                                         <li><a href="#">General FAQ</a></li>
-                                        <li><a href="#">Support Center</a></li>
-                                        <li><a href="#">Privacy Policy</a></li>
-                                        <li><a href="#">Terms & Conditions</a></li>
+                                        <li><a href="{% url 'core:legal_page' 'privacy-policy' %}">Privacy Policy</a></li>
+                                        <li><a href="{% url 'core:legal_page' 'terms-and-conditions' %}">Terms & Conditions</a></li>
+                                        <li><a href="{% url 'core:legal_page' 'cookie-policy' %}">Cookie Policy</a></li>
                                     </ul>
                                 </div>
                             </div>
@@ -603,6 +605,9 @@
                 <path d="M50,1 a49,49 0 0,1 0,98 a49,49 0 0,1 0,-98" />
             </svg>
         </div>
+
+        <!-- Include Cookie Consent -->
+    {% include 'includes/cookie_consent.html' %}
 
     </div>
 

@@ -3,15 +3,192 @@
 
 {% block title %}Job Listings - {{ site_name }}{% endblock %}
 
+{% block extra_css %}
+    <style>
+        /* Mobile Job Carousel Styles */
+        @media (max-width: 767px) {
+            .job-carousel-container {
+                padding: 10px;
+                background: #f8f9fa;
+                border-radius: 10px;
+                margin-bottom: 20px;
+            }
+            
+            .job-carousel-container .carousel-inner {
+                border-radius: 8px;
+                overflow: hidden;
+            }
+            
+            .job-carousel-container .carousel-item {
+                transition: transform 0.6s ease-in-out;
+            }
+            
+            .job-carousel-container .job-slide {
+                display: flex !important;
+                flex-direction: column;
+                height: 635px !important;
+                padding: 20px;
+                background: white;
+                border-radius: 8px;
+                box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+                margin: 5px;
+            }
+            
+            .job-carousel-container .job-slide .job-header {
+                flex-shrink: 0;
+                margin-bottom: 15px;
+            }
+            
+            .job-carousel-container .job-slide .job-icon {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                width: 60px;
+                height: 60px;
+                border-radius: 8px;
+                margin: 0 auto 15px;
+                background: #007bff;
+                color: white;
+                font-size: 1.5rem;
+            }
+            
+            .job-carousel-container .job-slide .job-title {
+                text-align: center;
+                margin-bottom: 10px;
+            }
+            
+            .job-carousel-container .job-slide .job-title h3 {
+                font-size: 1.2rem;
+                margin: 0;
+                min-height: 50px; /* Reserve space for 2-line titles */
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+            
+            .job-carousel-container .job-slide .job-location {
+                display: block;
+                text-align: center;
+                color: #6c757d;
+                font-size: 0.9rem;
+                min-height: 20px;
+            }
+            
+            .job-carousel-container .job-slide .job-details {
+                flex: 1;
+                overflow: hidden;
+                margin-bottom: 15px;
+            }
+            
+            .job-carousel-container .job-slide .job-detail-item {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 10px 0;
+                border-bottom: 1px solid #f0f0f0;
+                min-height: 40px;
+            }
+            
+            .job-carousel-container .job-slide .job-detail-item:last-child {
+                border-bottom: none;
+            }
+            
+            .job-carousel-container .job-slide .job-detail-item span:first-child {
+                color: #6c757d;
+                font-weight: 500;
+                font-size: 0.9rem;
+                white-space: nowrap;
+            }
+            
+            .job-carousel-container .job-slide .job-detail-item span:last-child {
+                font-weight: 600;
+                color: #333;
+                font-size: 0.9rem;
+                text-align: right;
+            }
+            
+            .job-carousel-container .job-slide .job-action {
+                flex-shrink: 0;
+                margin-top: auto;
+                text-align: center;
+            }
+            
+            .job-carousel-container .job-slide .job-action .btn {
+                display: inline-block;
+                width: 100%;
+            }
+            
+            .job-carousel-container .carousel-indicators {
+                position: relative;
+                margin-top: 15px;
+                bottom: 0;
+            }
+            
+            .job-carousel-container .carousel-indicators button {
+                transition: all 0.3s ease;
+                width: 10px;
+                height: 10px;
+                border-radius: 50%;
+                border: none;
+                margin: 0 5px;
+            }
+            
+            .job-carousel-container .carousel-indicators button.active {
+                background-color: #007bff !important;
+                width: 20px !important;
+                border-radius: 10px !important;
+            }
+            
+            /* Hide desktop view on mobile */
+            .desktop-job-list {
+                display: none;
+            }
+        }
+        
+        /* Desktop view styles */
+        @media (min-width: 768px) {
+            .mobile-job-carousel {
+                display: none;
+            }
+            
+            .desktop-job-list {
+                display: block;
+            }
+        }
+        
+        /* Featured badge */
+        .featured-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            background: #ffc107;
+            color: #000;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+        
+        /* Truncate long text */
+        .text-truncate-2 {
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+    </style>
+{% endblock %}
+
 {% block content %}
 
 <!-- page-title -->
-<section class="page-title centred pt_110 job-page-title">
+<section class="page-title centred pt_50 job-page-title">
     <div class="auto-container">
         <div class="content-box">
             <h1>Job Openings</h1>
             <ul class="bread-crumb clearfix">
-                <li><a href="index.html">Home</a></li>
+                <li><a href="{% url 'core:home' %}">Home</a></li>
                 <li>-</li>
                 <li>Job Openings</li>
             </ul>
@@ -116,46 +293,143 @@
 
         <div class="inner-container pt-4">
             {% if jobs %}
-            {% for job in jobs %}
-            <div class="job-block-one">
-                <div class="upper-box">
-                    <ul class="job-info">
-                        <li><i class="icon-43"></i> <span class="text-dark"> Posted: </span>{{ job.posted_at|timesince }} ago</li>
-                        <li><span class="text-dark"> Job Type: </span> {{ job.get_job_type_display }}</li>
-                        {% if job.is_featured %}
-                        <li><span class="badge bg-warning mb-2">Featured</span></li>
-                        {% endif %}
-                    </ul>                                
-                </div>
-                <div class="inner-box">
-                    <div class="title-box">
-                        <div class="icon-box">
-                            {% if job.category.icon %}
-                            <i class="{{ job.category.icon }}"></i>
-                            {% else %}
-                            <div class="bg-primary text-white d-flex align-items-center justify-content-center me-3" 
-                                    style="width: 60px; height: 60px; border-radius: 8px; font-size: 1.5rem;">
-                                {{ job.title|first|upper }}
+            
+            <!-- Mobile Job Carousel -->
+            <div id="jobCarousel" class="carousel slide mobile-job-carousel job-carousel-container" data-bs-ride="carousel" data-bs-interval="5000">
+                <div class="carousel-inner">
+                    {% for job in jobs %}
+                    <div class="carousel-item {% if forloop.first %}active{% endif %}">
+                        <div class="job-slide">
+                            <div class="job-header">
+                                {% if job.is_featured %}
+                                <div class="text-center mb-2">
+                                    <span class="featured-badge">
+                                        <i class="fas fa-star me-1"></i>Featured
+                                    </span>
+                                </div>
+                                {% endif %}
+                                
+                                <div class="job-icon">
+                                    {% if job.category.icon %}
+                                    <i class="{{ job.category.icon }}"></i>
+                                    {% else %}
+                                    {{ job.title|first|upper }}
+                                    {% endif %}
+                                </div>
+                                <div class="job-title">
+                                    <h3 class="text-truncate-2">{{ job.title }}</h3>
+                                    <span class="job-location">
+                                        <i class="fas fa-map-marker-alt me-2"></i>{{ job.location }}
+                                    </span>
+                                </div>
                             </div>
-                            {% endif %}
+                            
+                            <div class="job-details">
+                                <div class="job-detail-item">
+                                    <span><i class="fas fa-clock me-2"></i>Posted</span>
+                                    <span>{{ job.posted_at|timesince }} ago</span>
+                                </div>
+                                <div class="job-detail-item">
+                                    <span><i class="fas fa-briefcase me-2"></i>Job Type</span>
+                                    <span>{{ job.get_job_type_display }}</span>
+                                </div>
+                                <div class="job-detail-item">
+                                    <span><i class="fas fa-money-bill-wave me-2"></i>Salary</span>
+                                    <span>{{ job.get_salary_range }}</span>
+                                </div>
+                                <div class="job-detail-item">
+                                    <span><i class="fas fa-chart-line me-2"></i>Experience</span>
+                                    <span>{{ job.get_experience_level_display }}</span>
+                                </div>
+                                {% if job.company_name %}
+                                <div class="job-detail-item">
+                                    <span><i class="fas fa-building me-2"></i>Company</span>
+                                    <span class="text-truncate-2">{{ job.company_name }}</span>
+                                </div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="job-action">
+                                <a href="{% url 'jobs:job_detail' job.slug %}" class="theme-btn btn-one">
+                                    <i class="fas fa-eye me-2"></i>View Details
+                                </a>
+                            </div>
                         </div>
-                        <h3>{{ job.title }}</h3>
-                        <span><i class="fas fa-map-marker-alt"></i> {{ job.location }}</span>
                     </div>
-                    <div class="salary-box">
-                        <h5>Salary</h5>
-                        <span>{{ job.get_salary_range }}</span>
+                    {% endfor %}
+                </div>
+                
+                <!-- Indicators -->
+                <div class="carousel-indicators" style="position: relative; margin-top: 15px; bottom: 0;">
+                    {% for job in jobs %}
+                    <button type="button" 
+                            data-bs-target="#jobCarousel" 
+                            data-bs-slide-to="{{ forloop.counter0 }}" 
+                            class="{% if forloop.first %}active{% endif %}"
+                            aria-current="{% if forloop.first %}true{% endif %}"
+                            aria-label="Slide {{ forloop.counter }}"
+                            style="width: 10px; height: 10px; border-radius: 50%; background-color: {% if forloop.first %}#007bff{% else %}#ccc{% endif %}; border: none; margin: 0 5px;">
+                    </button>
+                    {% endfor %}
+                </div>
+                
+                <!-- Navigation Arrows -->
+                {% comment %} <button class="carousel-control-prev" type="button" data-bs-target="#jobCarousel" data-bs-slide="prev" 
+                        style="width: 30px; height: 30px; top: 50%; background: rgba(0,0,0,0.3); border-radius: 50%;">
+                    <span class="carousel-control-prev-icon" aria-hidden="true" style="width: 15px; height: 15px;"></span>
+                    <span class="visually-hidden">Previous</span>
+                </button>
+                <button class="carousel-control-next" type="button" data-bs-target="#jobCarousel" data-bs-slide="next" 
+                        style="width: 30px; height: 30px; top: 50%; background: rgba(0,0,0,0.3); border-radius: 50%;">
+                    <span class="carousel-control-next-icon" aria-hidden="true" style="width: 15px; height: 15px;"></span>
+                    <span class="visually-hidden">Next</span>
+                </button> {% endcomment %}
+            </div>
+            
+            <!-- Desktop Job List -->
+            <div class="desktop-job-list">
+                {% for job in jobs %}
+                <div class="job-block-one">
+                    <div class="upper-box">
+                        <ul class="job-info">
+                            <li><i class="icon-43"></i> <span class="text-dark"> Posted: </span>{{ job.posted_at|timesince }} ago</li>
+                            <li><span class="text-dark"> Job Type: </span> {{ job.get_job_type_display }}</li>
+                            {% if job.is_featured %}
+                            <li><span class="badge bg-warning mb-2">Featured</span></li>
+                            {% endif %}
+                        </ul>                                
                     </div>
-                    <div class="experience-box">
-                        <h5>Experience need</h5>
-                        <span>{{ job.get_experience_level_display }}</span>
-                    </div>
-                    <div class="btn-box">
-                        <a href="{% url 'jobs:job_detail' job.slug %}" class="theme-btn btn-one">View Details</a>
+                    <div class="inner-box">
+                        <div class="title-box">
+                            <div class="icon-box">
+                                {% if job.category.icon %}
+                                <i class="{{ job.category.icon }}"></i>
+                                {% else %}
+                                <div class="bg-primary text-white d-flex align-items-center justify-content-center me-3" 
+                                        style="width: 60px; height: 60px; border-radius: 8px; font-size: 1.5rem;">
+                                    {{ job.title|first|upper }}
+                                </div>
+                                {% endif %}
+                            </div>
+                            <h3>{{ job.title }}</h3>
+                            <span><i class="fas fa-map-marker-alt"></i> {{ job.location }}</span>
+                        </div>
+                        <div class="salary-box">
+                            <h5>Salary</h5>
+                            <span>{{ job.get_salary_range }}</span>
+                        </div>
+                        <div class="experience-box">
+                            <h5>Experience need</h5>
+                            <span>{{ job.get_experience_level_display }}</span>
+                        </div>
+                        <div class="btn-box">
+                            <a href="{% url 'jobs:job_detail' job.slug %}" class="theme-btn btn-one">View Details</a>
+                        </div>
                     </div>
                 </div>
+                {% endfor %}
             </div>
-            {% endfor %}
+            
             {% else %}
             <!-- No Jobs Found -->
             <div class="text-center py-5">
@@ -168,39 +442,38 @@
 
             <!-- Pagination -->
             {% if jobs.has_other_pages %}
-    <div class="pagination-wrapper">
-        <ul class="pagination clearfix">
-            {% if jobs.has_previous %}
-            <li>
-                <a href="?page={{ jobs.previous_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.location %}&location={{ request.GET.location }}{% endif %}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}{% if request.GET.job_type %}&job_type={{ request.GET.job_type }}{% endif %}{% if request.GET.experience_level %}&experience_level={{ request.GET.experience_level }}{% endif %}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}">
-                    <i class="icon-34"></i>
-                </a>
-            </li>
+            <div class="pagination-wrapper">
+                <ul class="pagination clearfix">
+                    {% if jobs.has_previous %}
+                    <li>
+                        <a href="?page={{ jobs.previous_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.location %}&location={{ request.GET.location }}{% endif %}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}{% if request.GET.job_type %}&job_type={{ request.GET.job_type }}{% endif %}{% if request.GET.experience_level %}&experience_level={{ request.GET.experience_level }}{% endif %}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}">
+                            <i class="icon-34"></i>
+                        </a>
+                    </li>
+                    {% endif %}
+
+                    {% for num in jobs.paginator.page_range %}
+                        {% if jobs.number == num %}
+                        <li><a class="current">{{ num }}</a></li>
+                        {% elif num > jobs.number|add:'-3' and num < jobs.number|add:'3' %}
+                        <li>
+                            <a href="?page={{ num }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.location %}&location={{ request.GET.location }}{% endif %}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}{% if request.GET.job_type %}&job_type={{ request.GET.job_type }}{% endif %}{% if request.GET.experience_level %}&experience_level={{ request.GET.experience_level }}{% endif %}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}">
+                                {{ num }}
+                            </a>
+                        </li>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% if jobs.has_next %}
+                    <li>
+                        <a href="?page={{ jobs.next_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.location %}&location={{ request.GET.location }}{% endif %}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}{% if request.GET.job_type %}&job_type={{ request.GET.job_type }}{% endif %}{% if request.GET.experience_level %}&experience_level={{ request.GET.experience_level }}{% endif %}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}">
+                            <i class="icon-35"></i>
+                        </a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </div>
             {% endif %}
-
-            {% for num in jobs.paginator.page_range %}
-                {% if jobs.number == num %}
-                <li><a class="current">{{ num }}</a></li>
-                {% elif num > jobs.number|add:'-3' and num < jobs.number|add:'3' %}
-                <li>
-                    <a href="?page={{ num }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.location %}&location={{ request.GET.location }}{% endif %}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}{% if request.GET.job_type %}&job_type={{ request.GET.job_type }}{% endif %}{% if request.GET.experience_level %}&experience_level={{ request.GET.experience_level }}{% endif %}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}">
-                        {{ num }}
-                    </a>
-                </li>
-                {% endif %}
-            {% endfor %}
-
-            {% if jobs.has_next %}
-            <li>
-                <a href="?page={{ jobs.next_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.location %}&location={{ request.GET.location }}{% endif %}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}{% if request.GET.job_type %}&job_type={{ request.GET.job_type }}{% endif %}{% if request.GET.experience_level %}&experience_level={{ request.GET.experience_level }}{% endif %}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}">
-                    <i class="icon-35"></i>
-                </a>
-            </li>
-            {% endif %}
-        </ul>
-    </div>
-{% endif %}
-
             
         </div>
     </div>
@@ -223,4 +496,38 @@
     </div>
 </section>
 {% endif %}
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Custom auto-slide with pause on hover for job carousel
+    document.addEventListener('DOMContentLoaded', function() {
+        const carousel = document.getElementById('jobCarousel');
+        if (carousel && window.innerWidth <= 767) {
+            const bsCarousel = new bootstrap.Carousel(carousel, {
+                interval: 5000, // Auto slide every 5 seconds
+                ride: 'carousel',
+                pause: 'hover' // Pause on hover
+            });
+            
+            // Pause when user interacts
+            carousel.addEventListener('mouseenter', () => {
+                bsCarousel.pause();
+            });
+            
+            carousel.addEventListener('mouseleave', () => {
+                bsCarousel.cycle();
+            });
+            
+            // Pause on touch
+            carousel.addEventListener('touchstart', () => {
+                bsCarousel.pause();
+            });
+            
+            carousel.addEventListener('touchend', () => {
+                setTimeout(() => bsCarousel.cycle(), 5000);
+            });
+        }
+    });
+</script>
 {% endblock %}

@@ -1,5 +1,6 @@
 # Create your models here.
 from django.db import models
+from django.urls import reverse
 from django_ckeditor_5.fields import CKEditor5Field
 from django.core.exceptions import ValidationError
 
@@ -106,3 +107,36 @@ class WhyChooseUs(models.Model):
     
     def __str__(self):
         return self.title
+    
+    
+
+class LegalPage(models.Model):
+    """Model for legal pages like Terms, Privacy Policy, etc."""
+    PAGE_TYPES = (
+        ('terms', 'Terms and Conditions'),
+        ('privacy', 'Privacy Policy'),
+        ('cookies', 'Cookie Policy'),
+        ('about', 'About Us'),
+        ('disclaimer', 'Disclaimer'),
+        ('refund', 'Refund Policy'),
+    )
+    
+    title = models.CharField(max_length=200)
+    slug = models.SlugField(unique=True, help_text="URL-friendly name (e.g., terms-and-conditions)")
+    page_type = models.CharField(max_length=20, choices=PAGE_TYPES, unique=True)
+    content = CKEditor5Field(config_name='extends')
+    last_updated = models.DateTimeField(auto_now=True)
+    is_active = models.BooleanField(default=True, help_text="Show/Hide this page")
+    meta_description = models.TextField(blank=True, help_text="SEO meta description")
+    meta_keywords = models.CharField(max_length=255, blank=True, help_text="SEO meta keywords")
+    
+    class Meta:
+        verbose_name = 'Legal Page'
+        verbose_name_plural = 'Legal Pages'
+        ordering = ['page_type']
+    
+    def __str__(self):
+        return self.title
+    
+    def get_absolute_url(self):
+        return reverse('core:legal_page', kwargs={'slug': self.slug})

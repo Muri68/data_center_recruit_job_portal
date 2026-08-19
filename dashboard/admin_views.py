@@ -695,6 +695,99 @@ def delete_why_choose_us(request, feature_id):
 
 
 
+# Add these views to your views.py
+
+from django.shortcuts import render, get_object_or_404
+from django.contrib.admin.views.decorators import staff_member_required
+from django.contrib import messages
+from django.shortcuts import redirect
+from core.models import LegalPage
+
+
+@login_required
+@user_passes_test(is_admin)
+def admin_legal_pages(request):
+    """Admin view to list all legal pages"""
+    legal_pages = LegalPage.objects.all().order_by('page_type')
+    
+    context = {
+        'legal_pages': legal_pages,
+        'page_title': 'Legal Pages Management',
+    }
+    return render(request, 'dashboard/admin/legal_pages.html', context)
+
+
+@login_required
+@user_passes_test(is_admin)
+def admin_legal_page_edit(request, page_id=None):
+    """Admin view to create/edit legal page"""
+    if page_id:
+        page = get_object_or_404(LegalPage, id=page_id)
+    else:
+        page = None
+    
+    if request.method == 'POST':
+        title = request.POST.get('title')
+        slug = request.POST.get('slug')
+        page_type = request.POST.get('page_type')
+        content = request.POST.get('content')
+        is_active = request.POST.get('is_active') == 'on'
+        meta_description = request.POST.get('meta_description', '')
+        meta_keywords = request.POST.get('meta_keywords', '')
+        
+        if page:
+            # Update existing page
+            page.title = title
+            page.slug = slug
+            page.page_type = page_type
+            page.content = content
+            page.is_active = is_active
+            page.meta_description = meta_description
+            page.meta_keywords = meta_keywords
+            page.save()
+            messages.success(request, f'"{title}" updated successfully!')
+        else:
+            # Create new page
+            page = LegalPage.objects.create(
+                title=title,
+                slug=slug,
+                page_type=page_type,
+                content=content,
+                is_active=is_active,
+                meta_description=meta_description,
+                meta_keywords=meta_keywords
+            )
+            messages.success(request, f'"{title}" created successfully!')
+        
+        return redirect('dashboard:admin_legal_pages')
+    
+    context = {
+        'page': page,
+        'page_types': LegalPage.PAGE_TYPES,
+        'page_title': 'Edit Legal Page' if page else 'Create Legal Page',
+    }
+    return render(request, 'dashboard/admin/legal_page_form.html', context)
+
+
+@login_required
+@user_passes_test(is_admin)
+def admin_legal_page_delete(request, page_id):
+    """Admin view to delete legal page"""
+    page = get_object_or_404(LegalPage, id=page_id)
+    
+    if request.method == 'POST':
+        title = page.title
+        page.delete()
+        messages.success(request, f'"{title}" deleted successfully!')
+        return redirect('dashboard:admin_legal_pages')
+    
+    context = {
+        'page': page,
+        'page_title': 'Delete Legal Page',
+    }
+    return render(request, 'dashboard/admin/legal_page_confirm_delete.html', context)
+
+
 
 
 from blog.models import BlogPost, BlogCategory, BlogComment

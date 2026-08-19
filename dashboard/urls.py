@@ -65,4 +65,10 @@ urlpatterns = [
     path('admin/blog/comments/', admin_views.admin_blog_comments, name='admin_blog_comments'),
     path('admin/blog/comments/<int:comment_id>/toggle/', admin_views.admin_toggle_comment, name='admin_toggle_comment'),
     path('admin/blog/comments/<int:comment_id>/delete/', admin_views.admin_delete_blog_comment, name='admin_delete_blog_comment'),
+    
+    # Admin Legal Pages
+    path('dashboard/legal-pages/', admin_views.admin_legal_pages, name='admin_legal_pages'),
+    path('dashboard/legal-pages/add/', admin_views.admin_legal_page_edit, name='admin_legal_page_add'),
+    path('dashboard/legal-pages/edit/<int:page_id>/', admin_views.admin_legal_page_edit, name='admin_legal_page_edit'),
+    path('dashboard/legal-pages/delete/<int:page_id>/', admin_views.admin_legal_page_delete, name='admin_legal_page_delete'),
 ]

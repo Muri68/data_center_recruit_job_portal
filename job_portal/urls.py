@@ -16,9 +16,19 @@ Including another URLconf
 """
 
 from django.contrib import admin
-from django.urls import path, include
+from django.urls import path, include, re_path
 from django.conf import settings
 from django.conf.urls.static import static
+from django.views.static import serve
+from django.shortcuts import render
+from django.http import JsonResponse
+
+# Custom error handlers
+handler404 = 'core.views.error_404'
+handler500 = 'core.views.error_500'
+handler503 = 'core.views.error_503'
+handler401 = 'core.views.error_401'
+handler403 = 'core.views.error_403'
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -28,10 +38,18 @@ urlpatterns = [
     path('blog/', include('blog.urls')),
     path('dashboard/', include('dashboard.urls')),
     
-    # CKEditor 5 URLs (add this)
+    # CKEditor 5 URLs
     path('ckeditor5/', include('django_ckeditor_5.urls')),
 ]
 
+# Serve media files in both development and production
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+else:
+    # Production - serve media files manually
+    urlpatterns += [
+        re_path(r'^media/(?P<path>.*)$', serve, {
+            'document_root': settings.MEDIA_ROOT,
+        }),
+    ]

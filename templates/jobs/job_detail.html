@@ -19,7 +19,6 @@
 </section>
 <!-- page-title end -->
 
-
 <!-- job-details -->
 <section class="job-details pt_110 pb_120">
     <div class="auto-container">
@@ -28,7 +27,7 @@
                 <div class="job-sidebar mr_40">
                     <div class="info-widget sidebar-widget mb_30">
                         <h4 class="card-title mb-4">Job Overview</h4>
-                        <ul class="clearfix">
+                        <ul class="clearfix job-overview-list">
                             <li>
                                 <h5>Location</h5>
                                 <p><i class="fas fa-map-marker-alt text-dark me-2"></i> {{ job.location }}</p>
@@ -45,25 +44,26 @@
                                 <h5>Job Type</h5>
                                 <p><i class="fas fa-briefcase text-dark me-2"></i> {{ job.get_job_type_display }}</p>
                             </li>
-                        <li>
-                            <h5>Category</h5>
-                            <p><i class="fas fa-layer-group text-dark me-2"></i> {{ job.category.name }}</p> 
-                        </li>
-                        <li>
-                            <h5>Posted On</h5>
-                            
-                            <p><i class="fas fa-calendar text-dark me-2"></i> {{ job.posted_at|date:"M d, Y" }}</p> 
-                        </li>
-                        <li>
-                            <h5>Vacancies</h5>
-                            <p><i class="fas fa-users text-dark me-2"></i> {{ job.vacancies }}</p>
-                        </li>
-                        {% if job.application_deadline %}
                             <li>
-                                <h5>Apply Within</h5>
-                                <p><i class="fas fa-clock text-dark me-2"></i> {{ job.vacancies }} {{ job.application_deadline|date:"M d, Y" }}</p>
+                                <h5>Employment Type</h5>
+                                <p><i class="fas fa-id-badge text-dark me-2"></i> {{ job.get_employment_type_display }}</p>
                             </li>
-                        {% endif %}
+                            <li>
+                                <h5>Hours</h5>
+                                <p><i class="fas fa-clock text-dark me-2"></i> {{ job.get_hours_display }}</p>
+                            </li>
+                            <li>
+                                <h5>Category</h5>
+                                <p><i class="fas fa-layer-group text-dark me-2"></i> {{ job.category.name }}</p>
+                            </li>
+                            <li>
+                                <h5>Posted On</h5>
+                                <p><i class="fas fa-calendar text-dark me-2"></i> {{ job.posted_at|date:"M d, Y" }}</p>
+                            </li>
+                            <li>
+                                <h5>Company</h5>
+                                <p><i class="fas fa-building text-dark me-2"></i> {{ job.company_name }}</p>
+                            </li>
                         </ul>
                     </div>
                 </div>
@@ -72,113 +72,252 @@
                 <div class="job-details-content">
                     <div class="d-flex align-items-center mb-4">
                         <div class="bg-primary text-white d-flex align-items-center justify-content-center me-3" 
-                             style="width: 80px; height: 80px; font-size: 2rem;">
+                             style="width: 80px; height: 80px; font-size: 2rem; border-radius: 10px;">
                             {{ job.title|first|upper }}
                         </div>
                         <div>
                             <h1 class="h2 mb-1">{{ job.title }}</h1>
+                            <p class="text-muted mb-0">{{ job.company_name }}</p>
                         </div>
                     </div>
                     
                     <div class="row mb-4">
-                        <div class="col-md-3">
-                            <small class="text-muted">Location</small>
-                            <p><i class="fas fa-map-marker-alt"></i> {{ job.location }}</p>
+                        <div class="col-md-3 col-sm-6 mb-3">
+                            <small class="text-muted d-block">Location</small>
+                            <p class="mb-0"><i class="fas fa-map-marker-alt text-primary"></i> {{ job.location }}</p>
                         </div>
-                        <div class="col-md-3">
-                            <small class="text-muted">Job Type</small>
-                            <p><span class="badge bg-primary">{{ job.get_job_type_display }}</span></p>
+                        <div class="col-md-3 col-sm-6 mb-3">
+                            <small class="text-muted d-block">Job Type</small>
+                            <p class="mb-0"><span class="badge bg-primary">{{ job.get_job_type_display }}</span></p>
                         </div>
-                        <div class="col-md-3">
-                            <small class="text-muted">Experience</small>
-                            <p><span class="badge bg-secondary">{{ job.get_experience_level_display }}</span></p>
+                        <div class="col-md-3 col-sm-6 mb-3">
+                            <small class="text-muted d-block">Employment Type</small>
+                            <p class="mb-0"><span class="badge bg-success">{{ job.get_employment_type_display }}</span></p>
                         </div>
-                        <div class="col-md-3">
-                            <small class="text-muted">Salary</small>
-                            <p><i class="fas fa-money-bill-wave"></i> {{ job.get_salary_range }}</p>
+                        <div class="col-md-3 col-sm-6 mb-3">
+                            <small class="text-muted d-block">Experience</small>
+                            <p class="mb-0"><span class="badge bg-secondary">{{ job.get_experience_level_display }}</span></p>
                         </div>
-                    </div>                   
-                    
-                    <div class="text-box mb_60">
-                        <h3>Job Description</h3>
-                        <p>{{ job.description|safe }}</p>
                     </div>
-                    <div class="text-box mb_55">
-                        <h3>Requirements</h3>
-                        <p class="mb-4">
-                            {{ job.requirements|safe }}
-                        </p>
+                    
+                    <div class="row mb-4">
+                        <div class="col-md-6 col-sm-6 mb-3">
+                            <small class="text-muted d-block">Salary</small>
+                            <p class="mb-0"><i class="fas fa-money-bill-wave text-success"></i> <b>{{ job.get_salary_range }}</b></p>
+                        </div>
+                        {% if job.is_remote %}
+                        <div class="col-md-3 col-sm-6 mb-3">
+                            <small class="text-muted d-block">Work Mode</small>
+                            <p class="mb-0"><span class="badge bg-info">Remote</span></p>
+                        </div>
+                        {% endif %}
+                        {% if job.is_featured %}
+                        <div class="col-md-3 col-sm-6 mb-3">
+                            <small class="text-muted d-block">Featured</small>
+                            <p class="mb-0"><span class="badge bg-warning text-dark">Featured Job</span></p>
+                        </div>
+                        {% endif %}
                     </div>
-
-
                     
-                    
-                    
-
-
-                    <div class="text-box mb_55">
-                        {% if job.benefits %}
-                            <h3>Benefits</h3>
-                            <div class="mb-4">
-                                {{ job.benefits|safe }}
-                            </div>
-                            {% endif %}
-                    </div>
-                    <div class="text-box mb_65">
-                        {% if job.skills_required.all %}
-                    <h3>Required Skills</h3>
-                    <div class="mb-4">
-                        {% for skill in job.skills_required.all %}
-                        <span class="badge bg-light text-dark me-1 mb-1 p-2">{{ skill }}</span>
-                        {% endfor %}
+                    {% if job.is_remote %}
+                    <div class="alert alert-info mb-4">
+                        <i class="fas fa-laptop-house me-2"></i> This is a remote position
                     </div>
                     {% endif %}
                     
-                
-                <div class="d-flex justify-content-between align-items-center mt-4 pt-4 border-top">
-                        <div class="text-muted">
+                    {% if job.is_featured %}
+                    <div class="alert alert-warning mb-4">
+                        <i class="fas fa-star me-2"></i> Featured Job
+                    </div>
+                    {% endif %}
+                    
+                    <div class="text-box mb_60">
+                        <h3>Job Description</h3>
+                        <div class="job-description-content">
+                            {{ job.job_description|safe }}
+                        </div>
+                    </div>
+                    
+                    {% if job.skills_required.all %}
+                    <div class="text-box mb_55">
+                        <h3>Required Skills</h3>
+                        <div class="mb-4">
+                            {% for skill in job.skills_required.all %}
+                            <span class="badge bg-light text-dark me-1 mb-1 p-2">{{ skill }}</span>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    <div class="d-flex justify-content-between align-items-center mt-4 pt-4 border-top flex-wrap">
+                        <div class="text-muted mb-3">
                             <small>
                                 <i class="far fa-clock"></i> Posted {{ job.posted_at|timesince }} ago
                                 | <i class="far fa-eye"></i> {{ job.views_count }} views
                                 | <i class="far fa-file-alt"></i> {{ job.applications_count }} applications
-                                {% if job.application_deadline %}
-                                | <i class="far fa-calendar-alt"></i> Deadline: {{ job.application_deadline|date:"M d, Y" }}
-                                {% endif %}
                             </small>
                         </div>
                         
                         {% if user.is_authenticated and user.is_job_seeker %}
                             {% if not has_applied %}
                             <a href="{% url 'dashboard:apply_job' job.slug %}" class="btn btn-primary btn-lg">
-                                Apply Now
+                                <i class="fas fa-paper-plane me-2"></i>Apply Now
                             </a>
                             {% else %}
-                            <button class="btn btn-success btn-lg" disabled>Already Applied</button>
+                            <button class="btn btn-success btn-lg" disabled>
+                                <i class="fas fa-check me-2"></i>Already Applied
+                            </button>
                             {% endif %}
                         {% elif not user.is_authenticated %}
                         <a href="{% url 'account_login' %}?next={% url 'jobs:job_detail' job.slug %}" 
                            class="btn btn-primary btn-lg">
-                            Login to Apply
+                            <i class="fas fa-sign-in-alt me-2"></i>Login to Apply
                         </a>
                         {% endif %}
                     </div>
-                </div>
-
-
-                    <ul class="share-box">
-                        <li>
-                            <h5>Share On:</h5>
-                        </li>
-                        <li><a href="job-details.html"><i class="icon-22"></i></a></li>
-                        <li><a href="job-details.html"><i class="icon-23"></i></a></li>
-                        <li><a href="job-details.html"><i class="icon-24"></i></a></li>
-                        <li><a href="job-details.html"><i class="icon-25"></i></a></li>
-                    </ul>
+                    
+                    <!-- Share Box -->
+                    <div class="share-box mt-4">
+                        <h5 class="d-inline-block me-3">Share On:</h5>
+                        <ul class="d-inline-block list-unstyled">
+                            <li class="d-inline-block me-2">
+                                <a href="https://www.facebook.com/sharer/sharer.php?u={{ request.build_absolute_uri }}" target="_blank" class="text-primary">
+                                    <i class="fab fa-facebook fa-2x"></i>
+                                </a>
+                            </li>
+                            <li class="d-inline-block me-2">
+                                <a href="https://twitter.com/intent/tweet?url={{ request.build_absolute_uri }}&text={{ job.title }}" target="_blank" class="text-info">
+                                    <i class="fab fa-twitter fa-2x"></i>
+                                </a>
+                            </li>
+                            <li class="d-inline-block me-2">
+                                <a href="https://www.linkedin.com/sharing/share-offsite/?url={{ request.build_absolute_uri }}" target="_blank" class="text-primary">
+                                    <i class="fab fa-linkedin fa-2x"></i>
+                                </a>
+                            </li>
+                            <li class="d-inline-block">
+                                <a href="mailto:?subject={{ job.title }}&body=Check out this job: {{ request.build_absolute_uri }}" class="text-secondary">
+                                    <i class="fas fa-envelope fa-2x"></i>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </section>
 <!-- job-details end -->
+
+<!-- Additional CSS for job description content -->
+<style>
+    h1, h2, h3, h4, h5, h6 {
+        padding-bottom: 10px;
+        margin-bottom: 15px;
+    }
+    
+    .job-description-content {
+        color: #333;
+        line-height: 1.8;
+        font-size: 15px;
+    }
+    
+    .job-description-content p {
+        margin-bottom: 15px;
+    }
+    
+    .job-description-content ul,
+    .job-description-content ol {
+        padding-left: 25px !important;
+        margin: 15px 0 !important;
+    }
+    
+    .job-description-content ul {
+        list-style-type: disc !important;
+    }
+    
+    .job-description-content ol {
+        list-style-type: decimal !important;
+    }
+    
+    .job-description-content li {
+        display: list-item !important;
+        margin-bottom: 8px !important;
+        color: #333;
+        list-style-position: outside !important;
+    }
+    
+    .job-description-content ul li {
+        list-style-type: disc !important;
+    }
+    
+    .job-description-content ol li {
+        list-style-type: decimal !important;
+    }
+    
+    .job-description-content h1,
+    .job-description-content h2,
+    .job-description-content h3,
+    .job-description-content h4,
+    .job-description-content h5,
+    .job-description-content h6 {
+        margin-top: 20px;
+        margin-bottom: 15px;
+        color: #222;
+    }
+    
+    .job-description-content a {
+        color: #007bff;
+        text-decoration: underline;
+    }
+    
+    .job-description-content table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 15px 0;
+    }
+    
+    .job-description-content table td,
+    .job-description-content table th {
+        border: 1px solid #ddd;
+        padding: 8px;
+    }
+    
+    .job-description-content img {
+        max-width: 100%;
+        height: auto;
+        margin: 10px 0;
+    }
+    
+    .job-overview-list {
+        list-style: none !important;
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+    
+    .job-overview-list li {
+        display: block !important;
+        padding: 12px 0;
+        border-bottom: 1px solid #eee;
+    }
+    
+    .job-overview-list li:last-child {
+        border-bottom: none;
+    }
+    
+    .job-overview-list h5 {
+        margin-bottom: 5px;
+        font-size: 14px;
+        font-weight: 600;
+        color: #666;
+    }
+    
+    .job-overview-list p {
+        margin: 0;
+        font-size: 15px;
+        font-weight: 500;
+        color: #333;
+    }
+</style>
  
 {% endblock %}

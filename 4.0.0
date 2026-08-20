@@ -1,0 +1,5 @@
+Requirement already satisfied: django-taggit in .\venv\Lib\site-packages (6.1.0)
+Requirement already satisfied: Django>=4.1 in .\venv\Lib\site-packages (from django-taggit) (5.2)
+Requirement already satisfied: asgiref>=3.8.1 in .\venv\Lib\site-packages (from Django>=4.1->django-taggit) (3.11.1)
+Requirement already satisfied: sqlparse>=0.3.1 in .\venv\Lib\site-packages (from Django>=4.1->django-taggit) (0.5.5)
+Requirement already satisfied: tzdata in .\venv\Lib\site-packages (from Django>=4.1->django-taggit) (2026.2)

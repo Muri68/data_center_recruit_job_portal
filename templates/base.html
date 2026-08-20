@@ -432,7 +432,12 @@
             <nav class="menu-box">
                 <div class="nav-logo">
                     <a href="index.html" aria-label="Home - Company Name">
+                        {% if site_logo %}
+                        <img src="{{ site_logo.url }}" alt="{{ site_name }} - Logo" loading="eager" width="180"
+                            height="60">
+                        {% else %}
                         <img src="assets/images/logo3.jpeg" alt="Company Logo" loading="eager" width="180" height="60">
+                        {% endif %}
                     </a>
                 </div>
                 <div class="menu-outer">

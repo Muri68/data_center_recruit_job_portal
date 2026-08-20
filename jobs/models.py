@@ -26,12 +26,40 @@ class Job(models.Model):
         ('freelance', 'Freelance'),
     )
     
+    EMPLOYMENT_TYPE_CHOICES = (
+        ('permanent', 'Permanent'),
+        ('temporary', 'Temporary'),
+        ('contract', 'Contract'),
+        ('fixed_term', 'Fixed Term'),
+        ('casual', 'Casual'),
+        ('zero_hours', 'Zero Hours'),
+    )
+    
+    HOURS_CHOICES = (
+        ('full_time', 'Full time'),
+        ('part_time', 'Part time'),
+        ('flexible', 'Flexible'),
+        ('shift_work', 'Shift work'),
+        ('compressed_hours', 'Compressed hours'),
+        ('job_share', 'Job share'),
+    )
+    
     EXPERIENCE_LEVEL_CHOICES = (
         ('entry', 'Entry Level'),
         ('mid', 'Mid Level'),
         ('senior', 'Senior Level'),
         ('lead', 'Lead/Manager'),
         ('executive', 'Executive'),
+    )
+    
+    SALARY_TYPE_CHOICES = (
+        ('hourly', 'Per Hour'),
+        ('daily', 'Per Day'),
+        ('weekly', 'Per Week'),
+        ('biweekly', 'Per Two Weeks'),
+        ('monthly', 'Per Month'),
+        ('quarterly', 'Per Quarter'),
+        ('annually', 'Per Year'),
     )
     
     STATUS_CHOICES = (
@@ -44,27 +72,23 @@ class Job(models.Model):
     slug = models.SlugField(unique=True)
     category = models.ForeignKey(JobCategory, on_delete=models.CASCADE, related_name='jobs')
     
-    company_name = models.CharField(max_length=200)
-    company_logo = models.ImageField(upload_to='company_logos/', blank=True, null=True)
-    company_website = models.URLField(blank=True)
+    company_name = models.CharField(max_length=200, default='Data Centre Recruit')
     
     location = models.CharField(max_length=200)
     job_type = models.CharField(max_length=20, choices=JOB_TYPE_CHOICES)
+    employment_type = models.CharField(max_length=20, choices=EMPLOYMENT_TYPE_CHOICES, default='permanent')
+    hours = models.CharField(max_length=20, choices=HOURS_CHOICES, default='full_time')
     experience_level = models.CharField(max_length=20, choices=EXPERIENCE_LEVEL_CHOICES)
     
     salary_min = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
     salary_max = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
     salary_currency = models.CharField(max_length=3, default='USD')
+    salary_type = models.CharField(max_length=20, choices=SALARY_TYPE_CHOICES, default='annually')
     is_salary_negotiable = models.BooleanField(default=False)
     
-    description = CKEditor5Field(config_name='extends', blank=True, null=True)
-    requirements = CKEditor5Field(config_name='extends', blank=True, null=True)
-    benefits = CKEditor5Field(config_name='extends', blank=True, null=True)
+    job_description = CKEditor5Field(config_name='extends', blank=True, null=True)
     
     skills_required = TaggableManager(help_text="Required skills for this job")
-    
-    vacancies = models.PositiveIntegerField(default=1)
-    application_deadline = models.DateTimeField(blank=True, null=True)
     
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='draft')
     
@@ -93,21 +117,24 @@ class Job(models.Model):
     def save(self, *args, **kwargs):
         if self.status == 'published' and not self.published_at:
             self.published_at = timezone.now()
+        if not self.company_name:
+            self.company_name = 'Data Centre Recruit'
         super().save(*args, **kwargs)
     
     def is_active(self):
-        if self.application_deadline:
-            return self.status == 'published' and timezone.now() <= self.application_deadline
         return self.status == 'published'
     
     def get_salary_range(self):
         if self.salary_min and self.salary_max:
-            return f"{self.salary_currency} {self.salary_min:,.0f} - {self.salary_max:,.0f}"
+            return f"{self.salary_currency} {self.salary_min:,.0f} - {self.salary_max:,.0f} {self.get_salary_type_display()}"
         elif self.salary_min:
-            return f"From {self.salary_currency} {self.salary_min:,.0f}"
+            return f"From {self.salary_currency} {self.salary_min:,.0f} {self.get_salary_type_display()}"
         elif self.salary_max:
-            return f"Up to {self.salary_currency} {self.salary_max:,.0f}"
+            return f"Up to {self.salary_currency} {self.salary_max:,.0f} {self.get_salary_type_display()}"
         return "Negotiable"
+    
+    def get_salary_type_display(self):
+        return dict(self.SALARY_TYPE_CHOICES).get(self.salary_type, '')
 
 class JobApplication(models.Model):
     STATUS_CHOICES = (

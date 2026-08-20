@@ -262,6 +262,32 @@ def admin_jobs(request):
     if category_filter:
         jobs = jobs.filter(category_id=category_filter)
     
+    # Handle category creation
+    if request.method == 'POST' and 'add_category' in request.POST:
+        category_name = request.POST.get('category_name', '').strip()
+        category_description = request.POST.get('category_description', '').strip()
+        category_icon = request.POST.get('category_icon', '').strip()
+        
+        if category_name:
+            # Check for duplicate category
+            slug = slugify(category_name)
+            if JobCategory.objects.filter(name__iexact=category_name).exists():
+                messages.error(request, f'Category "{category_name}" already exists!')
+            elif JobCategory.objects.filter(slug=slug).exists():
+                messages.error(request, f'A category with a similar name already exists!')
+            else:
+                JobCategory.objects.create(
+                    name=category_name,
+                    slug=slug,
+                    description=category_description,
+                    icon=category_icon
+                )
+                messages.success(request, f'Category "{category_name}" created successfully!')
+        else:
+            messages.error(request, 'Category name is required!')
+        
+        return redirect('dashboard:admin_jobs')
+    
     # Pagination
     paginator = Paginator(jobs, 20)
     page_number = request.GET.get('page')
@@ -278,100 +304,109 @@ def admin_jobs(request):
     }
     return render(request, 'dashboard/admin/jobs.html', context)
 
+
 @login_required
 @user_passes_test(is_admin)
 def create_job(request):
-    if request.method == 'POST':
-        # Process job creation form
-        job = Job.objects.create(
-            title=request.POST.get('title'),
-            slug=slugify(request.POST.get('title')),
-            category_id=request.POST.get('category'),
-            company_name=request.POST.get('company_name'),
-            location=request.POST.get('location'),
-            job_type=request.POST.get('job_type'),
-            experience_level=request.POST.get('experience_level'),
-            description=request.POST.get('description'),
-            requirements=request.POST.get('requirements'),
-            benefits=request.POST.get('benefits'),
-            salary_min=request.POST.get('salary_min') or None,
-            salary_max=request.POST.get('salary_max') or None,
-            salary_currency=request.POST.get('salary_currency', 'USD'),
-            is_salary_negotiable=request.POST.get('is_salary_negotiable') == 'on',
-            vacancies=request.POST.get('vacancies', 1),
-            application_deadline=request.POST.get('application_deadline') or None,
-            status=request.POST.get('status', 'draft'),
-            is_featured=request.POST.get('is_featured') == 'on',
-            is_remote=request.POST.get('is_remote') == 'on',
-            posted_by=request.user,
-        )
-        
-        # Handle company logo
-        if request.FILES.get('company_logo'):
-            job.company_logo = request.FILES['company_logo']
-            job.save()
-        
-        # Add skills
-        skills = request.POST.get('skills_required', '')
-        if skills:
-            job.skills_required.add(*[s.strip() for s in skills.split(',')])
-        
-        messages.success(request, 'Job created successfully!')
-        return redirect('dashboard:admin_jobs')
-    
-    categories = JobCategory.objects.all()
-    context = {
-        'categories': categories,
-        'page_title': 'Create Job',
-    }
-    return render(request, 'dashboard/admin/create_job.html', context)
+    return job_form(request)
+
 
 @login_required
 @user_passes_test(is_admin)
 def edit_job(request, job_id):
     job = get_object_or_404(Job, id=job_id)
-    
+    return job_form(request, job)
+
+def job_form(request, job=None):
     if request.method == 'POST':
-        job.title = request.POST.get('title')
-        job.category_id = request.POST.get('category')
-        job.company_name = request.POST.get('company_name')
-        job.location = request.POST.get('location')
-        job.job_type = request.POST.get('job_type')
-        job.experience_level = request.POST.get('experience_level')
-        job.description = request.POST.get('description')
-        job.requirements = request.POST.get('requirements')
-        job.benefits = request.POST.get('benefits')
-        job.salary_min = request.POST.get('salary_min') or None
-        job.salary_max = request.POST.get('salary_max') or None
-        job.salary_currency = request.POST.get('salary_currency', 'USD')
-        job.is_salary_negotiable = request.POST.get('is_salary_negotiable') == 'on'
-        job.vacancies = request.POST.get('vacancies', 1)
-        job.application_deadline = request.POST.get('application_deadline') or None
-        job.status = request.POST.get('status', 'draft')
-        job.is_featured = request.POST.get('is_featured') == 'on'
-        job.is_remote = request.POST.get('is_remote') == 'on'
+        # Get form data
+        title = request.POST.get('title')
+        category_id = request.POST.get('category')
+        company_name = request.POST.get('company_name', 'Data Centre Recruit')
+        location = request.POST.get('location')
+        job_type = request.POST.get('job_type')
+        employment_type = request.POST.get('employment_type', 'permanent')
+        hours = request.POST.get('hours', 'full_time')
+        experience_level = request.POST.get('experience_level')
+        salary_min = request.POST.get('salary_min') or None
+        salary_max = request.POST.get('salary_max') or None
+        salary_currency = request.POST.get('salary_currency', 'USD')
+        salary_type = request.POST.get('salary_type', 'annually')
+        is_salary_negotiable = request.POST.get('is_salary_negotiable') == 'on'
+        job_description = request.POST.get('job_description')
+        status = request.POST.get('status', 'draft')
+        is_featured = request.POST.get('is_featured') == 'on'
+        is_remote = request.POST.get('is_remote') == 'on'
         
-        if request.FILES.get('company_logo'):
-            job.company_logo = request.FILES['company_logo']
+        if job:
+            # Update existing job
+            job.title = title
+            job.category_id = category_id
+            job.company_name = company_name
+            job.location = location
+            job.job_type = job_type
+            job.employment_type = employment_type
+            job.hours = hours
+            job.experience_level = experience_level
+            job.salary_min = salary_min
+            job.salary_max = salary_max
+            job.salary_currency = salary_currency
+            job.salary_type = salary_type
+            job.is_salary_negotiable = is_salary_negotiable
+            job.job_description = job_description
+            job.status = status
+            job.is_featured = is_featured
+            job.is_remote = is_remote
+            job.save()
+            
+            # Update skills
+            job.skills_required.clear()
+            skills = request.POST.get('skills_required', '')
+            if skills:
+                job.skills_required.add(*[s.strip() for s in skills.split(',')])
+            
+            messages.success(request, 'Job updated successfully!')
+        else:
+            # Create new job
+            job = Job.objects.create(
+                title=title,
+                slug=slugify(title),
+                category_id=category_id,
+                company_name=company_name,
+                location=location,
+                job_type=job_type,
+                employment_type=employment_type,
+                hours=hours,
+                experience_level=experience_level,
+                salary_min=salary_min,
+                salary_max=salary_max,
+                salary_currency=salary_currency,
+                salary_type=salary_type,
+                is_salary_negotiable=is_salary_negotiable,
+                job_description=job_description,
+                status=status,
+                is_featured=is_featured,
+                is_remote=is_remote,
+                posted_by=request.user,
+            )
+            
+            # Add skills
+            skills = request.POST.get('skills_required', '')
+            if skills:
+                job.skills_required.add(*[s.strip() for s in skills.split(',')])
+            
+            messages.success(request, 'Job created successfully!')
         
-        job.save()
-        
-        # Update skills
-        job.skills_required.clear()
-        skills = request.POST.get('skills_required', '')
-        if skills:
-            job.skills_required.add(*[s.strip() for s in skills.split(',')])
-        
-        messages.success(request, 'Job updated successfully!')
         return redirect('dashboard:admin_jobs')
     
     categories = JobCategory.objects.all()
     context = {
-        'job': job,
         'categories': categories,
-        'page_title': f'Edit Job - {job.title}',
+        'job': job,
+        'page_title': 'Edit Job' if job else 'Create Job',
+        'is_edit': True if job else False,
     }
-    return render(request, 'dashboard/admin/edit_job.html', context)
+    return render(request, 'dashboard/admin/job_form.html', context)
 
 @login_required
 @user_passes_test(is_admin)
@@ -385,6 +420,7 @@ def delete_job(request, job_id):
         return redirect('dashboard:admin_jobs')
     
     return render(request, 'dashboard/admin/delete_job.html', {'job': job})
+
 
 @login_required
 @user_passes_test(is_admin)

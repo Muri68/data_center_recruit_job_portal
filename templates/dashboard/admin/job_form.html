@@ -1,0 +1,314 @@
+{% extends 'dashboard/admin/admin_base.html' %}
+{% load static %}
+
+{% block title %}{{ page_title }} - {{ site_name }}{% endblock %}
+
+{% block admin_content %}
+
+<div class="content container-fluid">
+    <div class="page-header">
+        <div class="row align-items-center">
+            <div class="col">
+                <h3 class="page-title">{{ page_title }}</h3>
+                <p class="text-mute">{% if is_edit %}Update job listing{% else %}Create a new job listing{% endif %}</p>
+                <ul class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{% url 'dashboard:redirect_dashboard' %}">Dashboard</a></li>
+                    <li class="breadcrumb-item active">{{ page_title }}</li>
+                </ul>
+            </div>
+            <div class="col-auto text-right float-right ml-auto">
+                <a href="{% url 'dashboard:admin_jobs' %}" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left me-2"></i>Back to Jobs
+                </a>
+            </div>
+        </div>
+    </div>
+
+<form method="POST" enctype="multipart/form-data" id="jobForm">
+    {% csrf_token %}
+    
+    <!-- Basic Information -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">
+                <i class="fas fa-info-circle me-2"></i>Basic Information
+            </h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-8 mb-3">
+                    <label for="title" class="form-label">Job Title *</label>
+                    <input type="text" class="form-control form-control-lg" id="title" name="title" required 
+                           placeholder="e.g., Senior Full Stack Developer" value="{{ job.title|default:'' }}">
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="category" class="form-label">Category *</label>
+                    <select class="form-control" id="category" name="category" required>
+                        <option value="">Select Category</option>
+                        {% for category in categories %}
+                        <option value="{{ category.id }}" {% if job and job.category_id == category.id %}selected{% endif %}>{{ category.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="company_name" class="form-label">Company Name *</label>
+                    <input type="text" class="form-control" id="company_name" name="company_name" 
+                           value="{{ job.company_name|default:'Data Centre Recruit' }}" required>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Job Details -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">
+                <i class="fas fa-briefcase me-2"></i>Job Details
+            </h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-4 mb-3">
+                    <label for="location" class="form-label">Location *</label>
+                    <input type="text" class="form-control" id="location" name="location" required 
+                           placeholder="e.g., New York, NY" value="{{ job.location|default:'' }}">
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="job_type" class="form-label">Job Type *</label>
+                    <select class="form-control" id="job_type" name="job_type" required>
+                        <option value="">Select Job Type</option>
+                        <option value="full_time" {% if job.job_type == 'full_time' %}selected{% endif %}>Full Time</option>
+                        <option value="part_time" {% if job.job_type == 'part_time' %}selected{% endif %}>Part Time</option>
+                        <option value="contract" {% if job.job_type == 'contract' %}selected{% endif %}>Contract</option>
+                        <option value="internship" {% if job.job_type == 'internship' %}selected{% endif %}>Internship</option>
+                        <option value="remote" {% if job.job_type == 'remote' %}selected{% endif %}>Remote</option>
+                        <option value="freelance" {% if job.job_type == 'freelance' %}selected{% endif %}>Freelance</option>
+                    </select>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="employment_type" class="form-label">Employment Type</label>
+                    <select class="form-control" id="employment_type" name="employment_type">
+                        <option value="permanent" {% if job.employment_type == 'permanent' %}selected{% endif %}>Permanent</option>
+                        <option value="temporary" {% if job.employment_type == 'temporary' %}selected{% endif %}>Temporary</option>
+                        <option value="contract" {% if job.employment_type == 'contract' %}selected{% endif %}>Contract</option>
+                        <option value="fixed_term" {% if job.employment_type == 'fixed_term' %}selected{% endif %}>Fixed Term</option>
+                        <option value="casual" {% if job.employment_type == 'casual' %}selected{% endif %}>Casual</option>
+                        <option value="zero_hours" {% if job.employment_type == 'zero_hours' %}selected{% endif %}>Zero Hours</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-4 mb-3">
+                    <label for="hours" class="form-label">Hours</label>
+                    <select class="form-control" id="hours" name="hours">
+                        <option value="full_time" {% if job.hours == 'full_time' %}selected{% endif %}>Full time</option>
+                        <option value="part_time" {% if job.hours == 'part_time' %}selected{% endif %}>Part time</option>
+                        <option value="flexible" {% if job.hours == 'flexible' %}selected{% endif %}>Flexible</option>
+                        <option value="shift_work" {% if job.hours == 'shift_work' %}selected{% endif %}>Shift work</option>
+                        <option value="compressed_hours" {% if job.hours == 'compressed_hours' %}selected{% endif %}>Compressed hours</option>
+                        <option value="job_share" {% if job.hours == 'job_share' %}selected{% endif %}>Job share</option>
+                    </select>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="experience_level" class="form-label">Experience Level *</label>
+                    <select class="form-control" id="experience_level" name="experience_level" required>
+                        <option value="">Select Experience Level</option>
+                        <option value="entry" {% if job.experience_level == 'entry' %}selected{% endif %}>Entry Level</option>
+                        <option value="mid" {% if job.experience_level == 'mid' %}selected{% endif %}>Mid Level</option>
+                        <option value="senior" {% if job.experience_level == 'senior' %}selected{% endif %}>Senior Level</option>
+                        <option value="lead" {% if job.experience_level == 'lead' %}selected{% endif %}>Lead/Manager</option>
+                        <option value="executive" {% if job.experience_level == 'executive' %}selected{% endif %}>Executive</option>
+                    </select>
+                </div>
+            </div>
+            
+            <!-- Salary Section -->
+            <div class="row">
+                <div class="col-md-2 mb-3">
+                    <label for="salary_min" class="form-label">Salary Min</label>
+                    <div class="input-group">
+                        <span class="input-group-text">$</span>
+                        <input type="number" class="form-control" id="salary_min" name="salary_min" 
+                               placeholder="50000" min="0" value="{{ job.salary_min|default:'' }}">
+                    </div>
+                </div>
+                <div class="col-md-2 mb-3">
+                    <label for="salary_max" class="form-label">Salary Max</label>
+                    <div class="input-group">
+                        <span class="input-group-text">$</span>
+                        <input type="number" class="form-control" id="salary_max" name="salary_max" 
+                               placeholder="80000" min="0" value="{{ job.salary_max|default:'' }}">
+                    </div>
+                </div>
+                <div class="col-md-2 mb-3">
+                    <label for="salary_currency" class="form-label">Currency</label>
+                    <select class="form-control" id="salary_currency" name="salary_currency">
+                        <option value="USD" {% if job.salary_currency == 'USD' %}selected{% endif %}>USD</option>
+                        <option value="EUR" {% if job.salary_currency == 'EUR' %}selected{% endif %}>EUR</option>
+                        <option value="GBP" {% if job.salary_currency == 'GBP' %}selected{% endif %}>GBP</option>
+                        <option value="CAD" {% if job.salary_currency == 'CAD' %}selected{% endif %}>CAD</option>
+                        <option value="AUD" {% if job.salary_currency == 'AUD' %}selected{% endif %}>AUD</option>
+                    </select>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <label for="salary_type" class="form-label">Salary Type</label>
+                    <select class="form-control" id="salary_type" name="salary_type">
+                        <option value="hourly" {% if job.salary_type == 'hourly' %}selected{% endif %}>Per Hour</option>
+                        <option value="daily" {% if job.salary_type == 'daily' %}selected{% endif %}>Per Day</option>
+                        <option value="weekly" {% if job.salary_type == 'weekly' %}selected{% endif %}>Per Week</option>
+                        <option value="biweekly" {% if job.salary_type == 'biweekly' %}selected{% endif %}>Per Two Weeks</option>
+                        <option value="monthly" {% if job.salary_type == 'monthly' %}selected{% endif %}>Per Month</option>
+                        <option value="quarterly" {% if job.salary_type == 'quarterly' %}selected{% endif %}>Per Quarter</option>
+                        <option value="annually" {% if job.salary_type == 'annually' %}selected{% endif %}>Per Year</option>
+                    </select>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <label class="form-label d-block">&nbsp;</label>
+                    <div class="form-check mt-2">
+                        <input class="form-check-input" type="checkbox" id="is_salary_negotiable" name="is_salary_negotiable" {% if job.is_salary_negotiable %}checked{% endif %}>
+                        <label class="form-check-label" for="is_salary_negotiable">
+                            Salary is negotiable
+                        </label>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-12 mb-3">
+                    <div class="mt-2">
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="checkbox" id="is_remote" name="is_remote" {% if job.is_remote %}checked{% endif %}>
+                            <label class="form-check-label" for="is_remote">
+                                <i class="fas fa-laptop-house me-1"></i>Remote Position
+                            </label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="checkbox" id="is_featured" name="is_featured" {% if job.is_featured %}checked{% endif %}>
+                            <label class="form-check-label" for="is_featured">
+                                <i class="fas fa-star me-1"></i>Featured Job
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Job Description -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">
+                <i class="fas fa-align-left me-2"></i>Job Description
+            </h5>
+        </div>
+        <div class="card-body">
+            <div class="mb-3">
+                <label for="job_description" class="form-label">Job Description *</label>
+                <textarea class="form-control" id="job_description" name="job_description" rows="20" 
+                          placeholder="Describe the role, responsibilities, requirements, benefits, and everything about this job...">{{ job.job_description|default:'' }}</textarea>
+            </div>
+        </div>
+    </div>
+
+    <!-- Skills Required -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">
+                <i class="fas fa-tools me-2"></i>Skills Required
+            </h5>
+        </div>
+        <div class="card-body">
+            <div class="mb-3">
+                <label for="skills_required" class="form-label">Skills (comma-separated)</label>
+                <input type="text" class="form-control" id="skills_required" name="skills_required" 
+                       placeholder="e.g., Python, JavaScript, React, Node.js, AWS"
+                       value="{% if job %}{% for skill in job.skills_required.all %}{{ skill.name }}{% if not forloop.last %}, {% endif %}{% endfor %}{% endif %}">
+                <div class="form-text">Enter skills separated by commas. These help job seekers find your posting.</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Publishing Options -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">
+                <i class="fas fa-rocket me-2"></i>Publishing Options
+            </h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="status" class="form-label">Status</label>
+                    <select class="form-control" id="status" name="status">
+                        <option value="draft" {% if job.status == 'draft' %}selected{% endif %}>Save as Draft</option>
+                        <option value="published" {% if job.status == 'published' %}selected{% endif %}>Publish</option>
+                        <option value="closed" {% if job.status == 'closed' %}selected{% endif %}>Closed</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center">
+                <a href="{% url 'dashboard:admin_jobs' %}" class="btn btn-outline-secondary btn-lg">
+                    <i class="fas fa-times me-2"></i>Cancel
+                </a>
+                <div>
+                    <button type="submit" name="status" value="draft" class="btn btn-outline-primary btn-lg me-2">
+                        <i class="fas fa-save me-2"></i>Save as Draft
+                    </button>
+                    <button type="submit" name="status" value="published" class="btn btn-primary btn-lg">
+                        <i class="fas fa-paper-plane me-2"></i>{% if is_edit %}Update Job{% else %}Publish Job{% endif %}
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+</div>
+
+<!-- TinyMCE from jsDelivr (No API Key Required) -->
+<script src="https://cdn.jsdelivr.net/npm/tinymce@6.8.3/tinymce.min.js"></script>
+<script>
+    tinymce.init({
+        selector: '#job_description',
+        height: 500,
+        menubar: true,
+        plugins: [
+            'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
+            'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
+            'insertdatetime', 'media', 'table', 'help', 'wordcount'
+        ],
+        toolbar: 'undo redo | blocks | ' +
+            'bold italic underline strikethrough | ' +
+            'alignleft aligncenter alignright alignjustify | ' +
+            'bullist numlist outdent indent | ' +
+            'link image table | ' +
+            'forecolor backcolor | ' +
+            'removeformat | help',
+        content_style: 'body { font-family:Helvetica,Arial,sans-serif; font-size:14px }',
+        branding: false,
+        promotion: false,
+        menubar: 'file edit view insert format tools table help',
+        menu: {
+            file: { title: 'File', items: 'newdocument restoredraft | preview | export print | deleteallconversations' },
+            edit: { title: 'Edit', items: 'undo redo | cut copy paste pastetext | selectall | searchreplace' },
+            view: { title: 'View', items: 'code | visualaid visualchars visualblocks | spellchecker | preview fullscreen | showcomments' },
+            insert: { title: 'Insert', items: 'image link media addcomment pageembed template codesample inserttable | charmap emoticons hr | pagebreak nonbreaking anchor tableofcontents | insertdatetime' },
+            format: { title: 'Format', items: 'bold italic underline strikethrough superscript subscript codeformat | blocks fontfamily fontsize align lineheight | forecolor backcolor | language | removeformat' },
+            tools: { title: 'Tools', items: 'spellchecker spellcheckerlanguage | a11ycheck code wordcount' },
+            table: { title: 'Table', items: 'inserttable tableprops deletetable row column cell' },
+            help: { title: 'Help', items: 'help' }
+        }
+    });
+</script>
+
+{% endblock %}
